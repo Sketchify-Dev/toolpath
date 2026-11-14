@@ -29,6 +29,8 @@ Open `http://localhost:3000/demo`. The page runs the demo task on load:
    (3 tools, 1,800 tokens, 3 round trips, 6 hops).
 3. Hit `Follow-up: entity reuse`, the second query reuses hydra/core and
    PR #412 with zero refetch.
+4. Hit `Ambiguous entity: tie-break`: two candidates for "Acme", the graph
+   keeps acme-corp by degree, 40 tools down to 2.
 
 Direct API checks:
 
@@ -72,7 +74,7 @@ requests against the live deployment: 60/60 HTTP 200, p50 1.0s, p95 2.6s
 synchronous and allocation-free). Reproduce with:
 
 ```bash
-for i in $(seq 1 200); do
+for i in $(seq 1 60); do
   curl -s -o /dev/null -w "%{http_code} %{time_total}\n" \
     "https://toolpath-five.vercel.app/api/compare?task=summarize%20PR%20%23412"
 done | sort | uniq -c | head
@@ -108,7 +110,8 @@ snapshot mode keeps the Vercel demo judge-proof either way.
 ## Demo script (60 seconds)
 
 - 0-15s: agents stuff 40 tool schemas into context before the first thought.
-- 15-45s: run the task, baseline vs toolpath numbers land side by side,
-  traversal path lights up.
-- 45-60s: follow-up query reuses entities with zero refetch.
+- 15-40s: run the task, baseline vs toolpath numbers land side by side,
+  traversal path lights up. 12,400 tokens down to 1,800.
+- 40-50s: follow-up query reuses entities with zero refetch.
+- 50-60s: ambiguous "Acme" resolves by graph degree, not prompt guessing.
   Soundbite: traverse, don't preload.
