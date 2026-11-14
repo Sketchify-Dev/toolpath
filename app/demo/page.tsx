@@ -17,19 +17,37 @@ interface ComparePayload {
 const SAMPLE = "summarize PR #412 and file a follow-up issue";
 const FOLLOWUP = "what repo was that PR in?";
 
-const POS: Record<string, { x: number; y: number }> = {};
-const LANE_Y: Record<string, number> = { task: 40, entity: 110, capability: 190, tool: 280 };
-const counters: Record<string, number> = { task: 0, entity: 0, capability: 0, tool: 0 };
+const TOOL_COLS = 9;
 
-function posFor(node: GraphNode, index: number): { x: number; y: number } {
-  if (POS[node.id]) return POS[node.id];
-  const lane = LANE_Y[node.type] ?? 200;
-  const slot = counters[node.type] ?? 0;
-  counters[node.type] = slot + 1;
-  const p = { x: 60 + (slot % 8) * 100 + (index % 3) * 12, y: lane };
-  POS[node.id] = p;
-  return p;
+function layoutFor(node: GraphNode, idxInType: number): { x: number; y: number } {
+  switch (node.type) {
+    case "task":
+      return { x: 380, y: 40 };
+    case "entity":
+      return { x: 150 + idxInType * 230, y: 110 };
+    case "capability":
+      return { x: 70 + idxInType * 124, y: 190 };
+    default: {
+      const col = idxInType % TOOL_COLS;
+      const row = Math.floor(idxInType / TOOL_COLS);
+      return { x: 48 + col * 79, y: 262 + row * 46 };
+    }
+  }
 }
+
+const RECT_W: Record<GraphNode["type"], number> = {
+  task: 200,
+  entity: 130,
+  capability: 110,
+  tool: 72,
+};
+
+const LABEL_LEN: Record<GraphNode["type"], number> = {
+  task: 26,
+  entity: 16,
+  capability: 14,
+  tool: 10,
+};
 
 function Tag({ label, color }: { label: string; color: string }) {
   return (
@@ -64,6 +82,7 @@ export default function DemoPage() {
   const [result, setResult] = useState<ComparePayload | null>(null);
   const [graph, setGraph] = useState<{ nodes: GraphNode[]; edges: GraphEdge[] } | null>(null);
   const [log, setLog] = useState<string[]>([]);
+  const [taskError, setTaskError] = useState<string | null>(null);
   const [litStep, setLitStep] = useState(0);
   const timers = useRef<number[]>([]);
 
@@ -148,8 +167,8 @@ export default function DemoPage() {
         }}
       >
         <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-3 px-6 py-3">
-          <div className="flex items-center gap-3">
-            <Link href="/" className="flex items-center gap-2.5" aria-label="Toolpath home">
+          <div className="flex items-center gap-2">
+            <Link href="/" className="flex min-h-[44px] items-center gap-2.5" aria-label="Toolpath home">
               <LogoMark size={24} />
               <span
                 className="text-lg font-bold tracking-tight"
@@ -180,7 +199,7 @@ export default function DemoPage() {
                 role="tab"
                 aria-selected={mode === m}
                 onClick={() => setMode(m)}
-                className="rounded-full px-4 py-1.5 font-medium capitalize transition-colors"
+                className="min-h-[44px] rounded-full px-4 py-1.5 font-medium capitalize transition-colors"
                 style={
                   mode === m
                     ? { background: "var(--accent)", color: "#0b0c0e" }
@@ -206,42 +225,65 @@ export default function DemoPage() {
         )}
 
         <form
-          className="flex gap-3 rounded-2xl border p-3"
-          style={{ borderColor: "var(--line)", background: "var(--surface)" }}
+          className="flex flex-col gap-2 rounded-2xl border p-3"
+          style={{ borderColor: taskError ? "var(--warn)" : "var(--line)", background: "var(--surface)" }}
           onSubmit={(e) => {
             e.preventDefault();
+            if (!task.trim()) {
+              setTaskError("Type a task first, for example: summarize PR #412 and file a follow-up issue.");
+              return;
+            }
+            setTaskError(null);
             runDemo(task);
           }}
+          noValidate
         >
-          <label htmlFor="demo-task" className="sr-only">
+          <label htmlFor="demo-task" className="px-1 text-sm font-medium" style={{ color: "var(--muted)" }}>
             Task for the agent
           </label>
-          <input
-            id="demo-task"
-            value={task}
-            onChange={(e) => setTask(e.target.value)}
-            placeholder="Ask the agent to do something..."
-            className="demo-num min-w-0 flex-1 bg-transparent px-3 py-2 text-base outline-none"
-            style={{ fontFamily: "var(--font-num)" }}
-          />
-          <button
-            type="submit"
-            disabled={loading}
-            className="rounded-xl px-6 py-2.5 text-sm font-semibold text-black disabled:opacity-60"
-            style={{ background: "var(--accent)" }}
-          >
-            {loading ? "Running..." : "Run"}
-          </button>
+          <div className="flex gap-3">
+            <input
+              id="demo-task"
+              value={task}
+              onChange={(e) => {
+                setTask(e.target.value);
+                if (taskError && e.target.value.trim()) setTaskError(null);
+              }}
+              onBlur={() => {
+                if (!task.trim()) setTaskError("Type a task first, for example: summarize PR #412 and file a follow-up issue.");
+              }}
+              placeholder="Ask the agent to do something..."
+              aria-invalid={taskError ? true : undefined}
+              aria-describedby={taskError ? "demo-task-error" : undefined}
+              className="demo-num min-h-[44px] min-w-0 flex-1 bg-transparent px-3 py-2 text-base outline-none disabled:opacity-50"
+              style={{ fontFamily: "var(--font-num)" }}
+            />
+            <button
+              type="submit"
+              disabled={loading}
+              className="inline-flex min-h-[44px] items-center rounded-xl px-6 py-2.5 text-sm font-semibold text-black disabled:cursor-wait disabled:opacity-60"
+              style={{ background: "var(--accent)" }}
+            >
+              {loading ? "Running..." : "Run"}
+            </button>
+          </div>
+          <div aria-live="polite">
+            {taskError && (
+              <p id="demo-task-error" className="px-1 text-sm" style={{ color: "var(--warn)" }}>
+                {taskError}
+              </p>
+            )}
+          </div>
         </form>
 
-        <div className="flex flex-wrap items-center gap-2 text-sm">
+          <div className="flex flex-wrap items-center gap-2 text-sm">
           <span style={{ color: "var(--muted)" }}>Try:</span>
           <button
             onClick={() => {
               setTask(SAMPLE);
               runDemo(SAMPLE);
             }}
-            className="rounded-full border px-4 py-1.5 transition-colors hover:border-[var(--accent)]"
+            className="inline-flex min-h-[44px] items-center rounded-full border px-4 py-1.5 transition-colors hover:border-[var(--accent)]"
             style={{ borderColor: "var(--line)", color: "var(--muted)" }}
           >
             Demo task
@@ -251,7 +293,7 @@ export default function DemoPage() {
               setTask(FOLLOWUP);
               runDemo(FOLLOWUP);
             }}
-            className="rounded-full border px-4 py-1.5 transition-colors hover:border-[var(--accent)]"
+            className="inline-flex min-h-[44px] items-center rounded-full border px-4 py-1.5 transition-colors hover:border-[var(--accent)]"
             style={{ borderColor: "var(--line)", color: "var(--muted)" }}
           >
             Follow-up: entity reuse
@@ -295,56 +337,75 @@ export default function DemoPage() {
                   </span>
                 </div>
                 <svg viewBox="0 0 760 330" className="h-[320px] w-full" role="img" aria-label="Tool graph traversal">
-                  {graph?.edges.map((e, i) => {
-                    const a = graph.nodes.find((n) => n.id === e.from);
-                    const b = graph.nodes.find((n) => n.id === e.to);
-                    if (!a || !b) return null;
-                    const pa = posFor(a, graph.nodes.indexOf(a));
-                    const pb = posFor(b, graph.nodes.indexOf(b));
-                    const lit = e.type !== "PROVIDES" || (a.loaded && b.loaded);
-                    const revealAt = e.type === "PROVIDES" ? 99 : i;
+                  {(() => {
+                    const seen: Record<string, number> = { task: 0, entity: 0, capability: 0, tool: 0 };
+                    const at: Record<string, { x: number; y: number }> = {};
+                    for (const n of graph?.nodes ?? []) {
+                      at[n.id] = layoutFor(n, seen[n.type] ?? 0);
+                      seen[n.type] = (seen[n.type] ?? 0) + 1;
+                    }
                     return (
-                      <line
-                        key={i}
-                        x1={pa.x}
-                        y1={pa.y}
-                        x2={pb.x}
-                        y2={pb.y}
-                        stroke={lit ? "var(--accent)" : "var(--line)"}
-                        strokeWidth={lit ? 2 : 1}
-                        opacity={lit ? (litStep >= revealAt ? 1 : 0.2) : 0.35}
-                        className={lit && litStep >= revealAt ? "path-lit" : undefined}
-                      />
+                      <>
+                        {graph?.edges.map((e, i) => {
+                          const a = graph.nodes.find((n) => n.id === e.from);
+                          const b = graph.nodes.find((n) => n.id === e.to);
+                          if (!a || !b) return null;
+                          // Only the lit traversal path gets edges. Unloaded catalog
+                          // tools stay as dimmed context with no lines, so the path reads
+                          // as a star instead of a hairball.
+                          const lit = e.type !== "PROVIDES" || (a.loaded && b.loaded);
+                          if (!lit) return null;
+                          const pa = at[e.from];
+                          const pb = at[e.to];
+                          if (!pa || !pb) return null;
+                          const revealAt = e.type === "PROVIDES" ? 99 : i;
+                          return (
+                            <line
+                              key={i}
+                              x1={pa.x}
+                              y1={pa.y}
+                              x2={pb.x}
+                              y2={pb.y}
+                              stroke="var(--accent)"
+                              strokeWidth={2}
+                              opacity={litStep >= revealAt ? 1 : 0.2}
+                              className={litStep >= revealAt ? "path-lit" : undefined}
+                            />
+                          );
+                        })}
+                        {graph?.nodes.map((n) => {
+                          const p = at[n.id];
+                          if (!p) return null;
+                          const lit = n.loaded;
+                          const w = RECT_W[n.type];
+                          return (
+                            <g key={n.id} opacity={lit ? 1 : 0.35}>
+                              {/* taste-skill-ignore: graph node labels in mono per data-terminal sheet, every figure in JetBrains Mono */}
+                              <rect
+                                x={p.x - w / 2}
+                                y={p.y - 14}
+                                width={w}
+                                height={28}
+                                rx={8}
+                                fill={lit ? "var(--accent-dim)" : "var(--surface)"}
+                                stroke={lit ? "var(--accent)" : "var(--line)"}
+                              />
+                              <text
+                                x={p.x}
+                                y={p.y + 4}
+                                textAnchor="middle"
+                                fontSize={11}
+                                fill={lit ? "var(--accent)" : "var(--muted)"}
+                                fontFamily="JetBrains Mono, monospace" // taste-skill-ignore: dealt data-terminal sheet mandates mono for graph figures
+                              >
+                                {n.label.slice(0, LABEL_LEN[n.type])}
+                              </text>
+                            </g>
+                          );
+                        })}
+                      </>
                     );
-                  })}
-                  {graph?.nodes.map((n, i) => {
-                    const p = posFor(n, i);
-                    const lit = n.loaded;
-                    return (
-                      <g key={n.id} opacity={lit ? 1 : 0.35}>
-                        {/* taste-skill-ignore: graph node labels in mono per data-terminal sheet, every figure in JetBrains Mono */}
-                        <rect
-                          x={p.x - 52}
-                          y={p.y - 14}
-                          width={104}
-                          height={28}
-                          rx={8}
-                          fill={lit ? "var(--accent-dim)" : "var(--surface)"}
-                          stroke={lit ? "var(--accent)" : "var(--line)"}
-                        />
-                        <text
-                          x={p.x}
-                          y={p.y + 4}
-                          textAnchor="middle"
-                          fontSize={11}
-                          fill={lit ? "var(--accent)" : "var(--muted)"}
-                          fontFamily="JetBrains Mono, monospace" // taste-skill-ignore: dealt data-terminal sheet mandates mono for graph figures
-                        >
-                          {n.label.slice(0, 16)}
-                        </text>
-                      </g>
-                    );
-                  })}
+                  })()}
                 </svg>
                 <p className="demo-num mt-2 text-xs" style={{ color: "var(--muted)", fontFamily: "var(--font-num)" }}>
                   {(toolpath?.path ?? []).join("  ->  ")}
@@ -373,40 +434,67 @@ export default function DemoPage() {
               </div>
             </section>
 
-            <section
-              className="overflow-x-auto rounded-2xl border"
-              style={{ borderColor: "var(--line)", background: "var(--surface)" }}
-            >
-              <table className="w-full min-w-[560px] border-collapse text-sm">
-                <thead>
-                  <tr style={{ color: "var(--muted)" }}>
-                    <th className="px-5 py-3 text-left font-medium">Metric</th>
-                    <th className="px-5 py-3 text-right font-medium">Baseline</th>
-                    <th className="px-5 py-3 text-right font-medium">Toolpath</th>
-                    <th className="demo-num px-5 py-3 text-right font-medium">Delta</th>
-                  </tr>
-                </thead>
-                <tbody className="demo-num" style={{ fontFamily: "var(--font-num)" }}>
-                  {[
-                    { k: "Tools loaded", b: baseline?.metrics.tools_loaded, t: toolpath?.metrics.tools_loaded },
-                    { k: "Context tokens", b: baseline?.metrics.context_tokens, t: toolpath?.metrics.context_tokens },
-                    { k: "Round trips", b: baseline?.metrics.round_trips, t: toolpath?.metrics.round_trips },
-                    { k: "Latency (ms)", b: baseline?.metrics.latency_ms, t: toolpath?.metrics.latency_ms },
-                    { k: "Traversal hops", b: baseline?.metrics.traversal_hops, t: toolpath?.metrics.traversal_hops },
-                  ].map((r) => (
-                    <tr key={r.k} className="border-t" style={{ borderColor: "var(--line)" }}>
-                      <td className="px-5 py-3">{r.k}</td>
-                      <td className="px-5 py-3 text-right opacity-60">{r.b?.toLocaleString()}</td>
-                      <td className="px-5 py-3 text-right" style={{ color: "var(--accent)" }}>
-                        {r.t?.toLocaleString()}
-                      </td>
-                      <td className="px-5 py-3 text-right" style={{ color: "var(--accent)" }}>
-                        -{r.b != null && r.t != null ? Math.round(((r.b - r.t) / Math.max(r.b, 1)) * 100) : 0}%
-                      </td>
+            <section aria-label="Baseline versus toolpath comparison">
+              <div
+                className="hidden overflow-x-auto rounded-2xl border md:block"
+                style={{ borderColor: "var(--line)", background: "var(--surface)" }}
+              >
+                <table className="w-full min-w-[560px] border-collapse text-sm">
+                  <thead>
+                    <tr style={{ color: "var(--muted)" }}>
+                      <th className="px-5 py-3 text-left font-medium" scope="col">Metric</th>
+                      <th className="px-5 py-3 text-right font-medium" scope="col">Baseline</th>
+                      <th className="px-5 py-3 text-right font-medium" scope="col">Toolpath</th>
+                      <th className="demo-num px-5 py-3 text-right font-medium" scope="col">Delta</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="demo-num" style={{ fontFamily: "var(--font-num)" }}>
+                    {[
+                      { k: "Tools loaded", b: baseline?.metrics.tools_loaded, t: toolpath?.metrics.tools_loaded },
+                      { k: "Context tokens", b: baseline?.metrics.context_tokens, t: toolpath?.metrics.context_tokens },
+                      { k: "Round trips", b: baseline?.metrics.round_trips, t: toolpath?.metrics.round_trips },
+                      { k: "Latency (ms)", b: baseline?.metrics.latency_ms, t: toolpath?.metrics.latency_ms },
+                      { k: "Traversal hops", b: baseline?.metrics.traversal_hops, t: toolpath?.metrics.traversal_hops },
+                    ].map((r) => (
+                      <tr key={r.k} className="border-t" style={{ borderColor: "var(--line)" }}>
+                        <td className="px-5 py-3" scope="row">{r.k}</td>
+                        <td className="px-5 py-3 text-right opacity-60">{r.b?.toLocaleString()}</td>
+                        <td className="px-5 py-3 text-right" style={{ color: "var(--accent)" }}>
+                          {r.t?.toLocaleString()}
+                        </td>
+                        <td className="px-5 py-3 text-right" style={{ color: "var(--accent)" }}>
+                          -{r.b != null && r.t != null ? Math.round(((r.b - r.t) / Math.max(r.b, 1)) * 100) : 0}%
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <div className="grid gap-3 md:hidden">
+                {[
+                  { k: "Tools loaded", b: baseline?.metrics.tools_loaded, t: toolpath?.metrics.tools_loaded },
+                  { k: "Context tokens", b: baseline?.metrics.context_tokens, t: toolpath?.metrics.context_tokens },
+                  { k: "Round trips", b: baseline?.metrics.round_trips, t: toolpath?.metrics.round_trips },
+                  { k: "Latency (ms)", b: baseline?.metrics.latency_ms, t: toolpath?.metrics.latency_ms },
+                  { k: "Traversal hops", b: baseline?.metrics.traversal_hops, t: toolpath?.metrics.traversal_hops },
+                ].map((r) => (
+                  <div
+                    key={r.k}
+                    className="demo-num rounded-2xl border p-4"
+                    style={{ borderColor: "var(--line)", background: "var(--surface)", fontFamily: "var(--font-num)" }}
+                  >
+                    <p className="text-sm" style={{ color: "var(--muted)", fontFamily: "var(--font-geist-sans)" }}>{r.k}</p>
+                    <p className="mt-2 flex items-baseline justify-between">
+                      <span className="text-2xl font-bold" style={{ color: "var(--accent)" }}>
+                        {r.t?.toLocaleString()}
+                      </span>
+                      <span className="text-sm" style={{ color: "var(--muted)" }}>
+                        baseline {r.b?.toLocaleString()} (-{r.b != null && r.t != null ? Math.round(((r.b - r.t) / Math.max(r.b, 1)) * 100) : 0}%)
+                      </span>
+                    </p>
+                  </div>
+                ))}
+              </div>
             </section>
 
             {(toolpath?.entities_reused ?? 0) > 0 || toolpath?.metrics.cache_hit ? (
@@ -436,15 +524,15 @@ export default function DemoPage() {
 
       <footer className="border-t" style={{ borderColor: "var(--line)" }}>
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-3 px-6 py-6 text-sm sm:flex-row sm:items-center sm:justify-between" style={{ color: "var(--muted)" }}>
-          <div className="flex items-center gap-2.5">
+          <div className="flex min-h-[44px] items-center gap-2.5">
             <LogoMark size={20} />
-            <Link href="/" className="transition-colors hover:text-[var(--text)]">
+            <Link href="/" className="inline-flex min-h-[44px] items-center transition-colors hover:text-[var(--text)]">
               Back to Toolpath home
             </Link>
           </div>
-          <nav className="flex flex-wrap gap-5">
-            <Link href="/privacy" className="transition-colors hover:text-[var(--text)]">Privacy</Link>
-            <a href="https://github.com/Sketchify-Dev/toolpath" className="transition-colors hover:text-[var(--text)]">GitHub</a>
+          <nav className="flex flex-wrap gap-1">
+            <Link href="/privacy" className="inline-flex min-h-[44px] items-center px-2 transition-colors hover:text-[var(--text)]">Privacy</Link>
+            <a href="https://github.com/Sketchify-Dev/toolpath" className="inline-flex min-h-[44px] items-center px-2 transition-colors hover:text-[var(--text)]">GitHub</a>
           </nav>
         </div>
       </footer>

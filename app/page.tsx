@@ -80,23 +80,23 @@ export default function Home() {
               Toolpath
             </span>
           </Link>
-          <nav className="hidden items-center gap-7 text-sm sm:flex" style={{ color: "var(--muted)" }}>
-            <Link href="/demo" className="transition-colors hover:text-[var(--text)]">
+          <nav className="hidden items-center gap-2 text-sm sm:flex" style={{ color: "var(--muted)" }}>
+            <Link href="/demo" className="inline-flex min-h-[44px] items-center px-2 transition-colors hover:text-[var(--text)]">
               Demo
             </Link>
-            <Link href="/privacy" className="transition-colors hover:text-[var(--text)]">
+            <Link href="/privacy" className="inline-flex min-h-[44px] items-center px-2 transition-colors hover:text-[var(--text)]">
               Privacy
             </Link>
             <a
               href="https://github.com/Sketchify-Dev/toolpath"
-              className="transition-colors hover:text-[var(--text)]"
+              className="inline-flex min-h-[44px] items-center px-2 transition-colors hover:text-[var(--text)]"
             >
               GitHub
             </a>
           </nav>
           <Link
             href="/demo"
-            className="rounded-full px-5 py-2 text-sm font-semibold text-black transition-transform hover:scale-105"
+            className="inline-flex min-h-[44px] items-center rounded-full px-5 py-2 text-sm font-semibold text-black transition-transform hover:scale-105"
             style={{ background: "var(--accent)" }}
           >
             Open demo
@@ -385,12 +385,12 @@ export default function Home() {
             <LogoMark size={22} />
             <span>Toolpath for the HydraDB Hackathon, Track 2.</span>
           </div>
-          <nav className="flex flex-wrap gap-5">
-            <Link href="/demo" className="transition-colors hover:text-[var(--text)]">Demo</Link>
-            <Link href="/privacy" className="transition-colors hover:text-[var(--text)]">Privacy</Link>
-            <Link href="/sitemap.xml" className="transition-colors hover:text-[var(--text)]">Sitemap</Link>
-            <Link href="/llms.txt" className="transition-colors hover:text-[var(--text)]">llms.txt</Link>
-            <a href="https://github.com/Sketchify-Dev/toolpath" className="transition-colors hover:text-[var(--text)]">GitHub</a>
+          <nav className="flex flex-wrap gap-1">
+            <Link href="/demo" className="inline-flex min-h-[44px] items-center px-2 transition-colors hover:text-[var(--text)]">Demo</Link>
+            <Link href="/privacy" className="inline-flex min-h-[44px] items-center px-2 transition-colors hover:text-[var(--text)]">Privacy</Link>
+            <Link href="/sitemap.xml" className="inline-flex min-h-[44px] items-center px-2 transition-colors hover:text-[var(--text)]">Sitemap</Link>
+            <Link href="/llms.txt" className="inline-flex min-h-[44px] items-center px-2 transition-colors hover:text-[var(--text)]">llms.txt</Link>
+            <a href="https://github.com/Sketchify-Dev/toolpath" className="inline-flex min-h-[44px] items-center px-2 transition-colors hover:text-[var(--text)]">GitHub</a>
           </nav>
         </div>
       </footer>
