@@ -1,0 +1,24 @@
+# Toolpath
+
+Agent context layer on HydraDB, built for the HydraDB Hackathon, Track 2.
+Traverse, don't preload: one graph traversal replaces forty preloaded tool schemas.
+
+## Pages
+
+- / : landing, problem, proof numbers, how it works, sponsor tech, FAQ
+- /demo : live demo, baseline vs toolpath, traversal visualizer, run log, compare table
+- /privacy : privacy note, no tracking, no accounts
+
+## APIs (all JSON under /api, disallowed in robots.txt)
+
+- GET /api/health : { mode: "live" | "snapshot", hydra_reachable }
+- GET /api/compare?task= : baseline vs toolpath runs plus token/round-trip/latency delta
+- GET /api/traverse?task= : traversal path and cypher used for the task
+- GET /api/graph?task= : nodes and edges for the SVG visualizer
+- POST /api/run { task, mode } : run baseline or toolpath for a task
+- POST /api/seed : seed the tool graph with MERGE-only statements (409 in snapshot mode)
+
+## Repo
+
+https://github.com/Sketchify-Dev/toolpath. Snapshot mode by default; set HYDRA_URL,
+HYDRA_TOKEN, HYDRA_CELL, HYDRA_GRAPH to go live.
