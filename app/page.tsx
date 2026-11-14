@@ -71,7 +71,7 @@ export default function Home() {
         }}
       >
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-3">
-          <Link href="/" className="flex items-center gap-2.5" aria-label="Toolpath home">
+          <Link href="/" className="flex min-h-[44px] items-center gap-2.5" aria-label="Toolpath home">
             <LogoMark />
             <span
               className="text-lg font-bold tracking-tight"

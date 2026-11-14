@@ -17,7 +17,7 @@ interface ComparePayload {
 const SAMPLE = "summarize PR #412 and file a follow-up issue";
 const FOLLOWUP = "what repo was that PR in?";
 
-const TOOL_COLS = 9;
+const TOOL_COLS = 8;
 
 function layoutFor(node: GraphNode, idxInType: number): { x: number; y: number } {
   switch (node.type) {
@@ -30,23 +30,23 @@ function layoutFor(node: GraphNode, idxInType: number): { x: number; y: number }
     default: {
       const col = idxInType % TOOL_COLS;
       const row = Math.floor(idxInType / TOOL_COLS);
-      return { x: 48 + col * 79, y: 262 + row * 46 };
+      return { x: 52 + col * 88, y: 262 + row * 46 };
     }
   }
 }
 
 const RECT_W: Record<GraphNode["type"], number> = {
-  task: 200,
+  task: 210,
   entity: 130,
   capability: 110,
-  tool: 72,
+  tool: 82,
 };
 
 const LABEL_LEN: Record<GraphNode["type"], number> = {
-  task: 26,
+  task: 28,
   entity: 16,
   capability: 14,
-  tool: 10,
+  tool: 12,
 };
 
 function Tag({ label, color }: { label: string; color: string }) {
@@ -418,15 +418,27 @@ export default function DemoPage() {
               >
                 <h2 className="mb-2 text-base font-semibold">Run log</h2>
                 <div className="grid max-h-[320px] flex-1 auto-rows-min gap-1 overflow-y-auto text-xs leading-5">
-                  {log.map((line, i) => (
-                    <div key={i} className="grid grid-cols-[52px_1fr] gap-2">
-                      <Tag label={tagLabel(line)} color={tagColor(line)} />
-                      {/* taste-skill-ignore: run log body in mono per data-terminal sheet, every figure in JetBrains Mono */}
-                      <span style={{ color: "var(--text)" }}>
-                        {line.replace(/^\S+ \[(graph|cypher|tool|llm|snapshot)\] /, "")}
-                      </span>
-                    </div>
-                  ))}
+                  {log.map((line, i) => {
+                    const isCypher = line.includes("[cypher]");
+                    const body = line.replace(/^\S+ \[(graph|cypher|tool|llm|snapshot)\] /, "");
+                    return (
+                      <div key={i} className="grid grid-cols-[52px_1fr] gap-2">
+                        <Tag label={tagLabel(line)} color={tagColor(line)} />
+                        {isCypher ? (
+                          <pre
+                            className="demo-num overflow-x-auto rounded-lg px-2 py-1 text-[11px] leading-5"
+                            style={{ background: "var(--bg)", color: "var(--text)", fontFamily: "var(--font-num)" }}
+                          >
+                            {/* taste-skill-ignore: cypher query in mono per data-terminal sheet, code ships in JetBrains Mono */}
+                            {body}
+                          </pre>
+                        ) : (
+                          /* taste-skill-ignore: run log body in mono per data-terminal sheet, every figure in JetBrains Mono */
+                          <span style={{ color: "var(--text)" }}>{body}</span>
+                        )}
+                      </div>
+                    );
+                  })}
                   {log.length === 0 && (
                     <p style={{ color: "var(--muted)" }}>Waiting for a run...</p>
                   )}
