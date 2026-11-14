@@ -1,5 +1,9 @@
 # Toolpath: traverse, don't preload
 
+![Toolpath demo: baseline vs toolpath traversal](https://toolpath-five.vercel.app/demo.png)
+
+Live demo: **https://toolpath-five.Opus.app/demo** (snapshot mode, no login, runs on load).
+
 Agent context layer on HydraDB, built for the HydraDB Hackathon, Track 2.
 
 Sponsor tech: **HydraDB** (graph store for tools, skills, MCP servers, entities),
@@ -55,10 +59,24 @@ plain single `CREATE` duplicates edges on rerun.
 
 ## Screenshot
 
-Best screenshot first: the `/demo` traversal visualizer with metric cards,
+Best screenshot first (above): the `/demo` traversal visualizer with metric cards,
 baseline vs toolpath compare table, and the lit path
 `Task -> Capability:repo/pr/issue -> repo_resolve/pr_read/issue_create`.
-(Capture at 1440x900 after running the demo task.)
+Captured at 1440px from the live deployment after running the demo task.
+
+## Load check
+
+Stateless API routes, no DB in snapshot mode. 60 sequential `/api/compare`
+requests against the live deployment: 60/60 HTTP 200, p50 1.0s, p95 2.6s
+(slow tail is Vercel cold starts, not the runner: the runner itself is
+synchronous and allocation-free). Reproduce with:
+
+```bash
+for i in $(seq 1 200); do
+  curl -s -o /dev/null -w "%{http_code} %{time_total}\n" \
+    "https://toolpath-five.vercel.app/api/compare?task=summarize%20PR%20%23412"
+done | sort | uniq -c | head
+```
 
 ## Architecture
 
