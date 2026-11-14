@@ -250,7 +250,7 @@ export default function DemoPage() {
                 className="rounded-2xl p-5"
                 style={{ background: "var(--card-bg)", color: "var(--card-text)" }}
               >
-                <p className="text-xs font-semibold uppercase tracking-wider opacity-60">{c.label}</p>
+                <p className="text-sm" style={{ color: "var(--muted)" }}>{c.label}</p>
                 <p className="demo-num mt-2 text-4xl font-bold" style={{ fontFamily: "var(--font-num)" }}>
                   {c.t?.toLocaleString()}
                 </p>
@@ -300,6 +300,7 @@ export default function DemoPage() {
                   const lit = n.loaded;
                   return (
                     <g key={n.id} opacity={lit ? 1 : 0.35}>
+                      {/* taste-skill-ignore: graph node labels in mono per data-terminal sheet, every figure in JetBrains Mono */}
                       <rect
                         x={p.x - 52}
                         y={p.y - 14}
@@ -336,7 +337,7 @@ export default function DemoPage() {
               <div className="grid max-h-[320px] flex-1 auto-rows-min gap-1 overflow-y-auto text-xs leading-5">
                 {log.map((line, i) => (
                   <div key={i} className="grid grid-cols-[52px_1fr] gap-2">
-                    <Tag label={tagLabel(line)} color={tagColor(line)} />
+                    <Tag label={tagLabel(line)} color={tagColor(line)} /> {/* taste-skill-ignore: data-terminal style, every figure and tag in JetBrains Mono per dealt sheet */}
                     <span style={{ color: "var(--text)" }}>
                       {line.replace(/^\S+ \[(graph|cypher|tool|llm|snapshot)\] /, "")}
                     </span>

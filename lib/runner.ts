@@ -68,7 +68,7 @@ const TASK_CAPABILITY_MAP: Array<{ match: RegExp; caps: string[] }> = [
   { match: /summarize pr|pr #?\d+/i, caps: ["cap:repo", "cap:pr", "cap:issue"] },
   { match: /follow.?up issue/i, caps: ["cap:repo", "cap:pr", "cap:issue"] },
   { match: /what repo was that/i, caps: ["cap:repo", "cap:pr"] },
-  { match: /invoice.*acme/i, caps: ["cap:search", "cap:docs"] },
+  { match: /invoice.*northwind/i, caps: ["cap:search", "cap:docs"] },
   { match: /same invoice.*cfo/i, caps: ["cap:search"] },
 ];
 
@@ -107,11 +107,11 @@ function summarize(task: string, mode: RunMode, tools: string[]): string {
       ? "hydra/core, reused from the previous run with no refetch."
       : "hydra/core, re-derived by listing repos again.";
   }
-  if (/invoice.*acme/i.test(task)) {
-    return "Invoice #4471 for Acme Corp ($18,204) emailed to billing@acme.example.";
+  if (/invoice.*northwind/i.test(task)) {
+    return "Invoice #4471 for Northwind Traders ($18,204) emailed to billing@northwind.example.";
   }
   if (/same invoice.*cfo/i.test(task)) {
-    return "Invoice #4471 forwarded to the Acme CFO, entity reused from run 1.";
+    return "Invoice #4471 forwarded to the Northwind CFO, entity reused from run 1.";
   }
   return `Completed "${task}" using ${tools.join(", ")}.`;
 }
