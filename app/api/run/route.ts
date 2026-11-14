@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { runBaseline, runToolpath, type RunMode } from "@/lib/runner";
+import { hydraConfig, hydraQuery } from "@/lib/hydra";
 
 const sessions = new Map<string, string[]>();
 const SESSION = "demo-session";
@@ -40,6 +41,19 @@ export async function POST(request: Request) {
   const result = mode === "baseline" ? runBaseline(task) : runToolpath(task, sessionEntities());
   if (mode === "toolpath" && !result.degraded) {
     remember(["repo:hydra/core", "pr:hydra/core#412"]);
+    const cfg = hydraConfig();
+    if (cfg.mode === "live") {
+      try {
+        const live = await hydraQuery(
+          `MATCH (t:Tool)-[:PROVIDES]->(c:Capability) WHERE c.id = 'cap:repo' OR c.id = 'cap:pr' OR c.id = 'cap:issue' RETURN count(t) AS tools`,
+        );
+        result.log.unshift(`[graph] live HydraDB check: ${JSON.stringify(live.rows)}`);
+      } catch (err) {
+        result.log.unshift(
+          `[graph] live HydraDB unreachable (${err instanceof Error ? err.message : "error"}), snapshot numbers used`,
+        );
+      }
+    }
   }
   return NextResponse.json({ data: result });
 }
