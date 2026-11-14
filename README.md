@@ -1,36 +1,96 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Toolpath: traverse, don't preload
 
-## Getting Started
+Agent context layer on HydraDB, built for the HydraDB Hackathon, Track 2.
 
-First, run the development server:
+Sponsor tech: **HydraDB** (graph store for tools, skills, MCP servers, entities),
+**OpenCypher** (task to capability to tool traversal), **algo.MSpaths**
+(multi-source resolution in one round trip).
+
+Agents preload forty tool schemas into context and chain round trips. Toolpath
+traverses the graph and pulls only the three tools the task needs.
+
+## How to test
+
+No demo accounts, no login, nothing to sign up for.
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open `http://localhost:3000/demo`. The page runs the demo task on load:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. Type or keep `summarize PR #412 and file a follow-up issue`, hit Run.
+2. Watch baseline (40 tools, ~12,400 tokens, 4 round trips) vs toolpath
+   (3 tools, 1,800 tokens, 3 round trips, 6 hops).
+3. Hit `Follow-up: entity reuse`, the second query reuses hydra/core and
+   PR #412 with zero refetch.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Direct API checks:
 
-## Learn More
+```bash
+curl -s http://localhost:3000/api/health
+curl -s "http://localhost:3000/api/compare?task=summarize%20PR%20%23412" | head -c 400
+curl -s -X POST http://localhost:3000/api/run \
+  -H 'Content-Type: application/json' \
+  --data '{"task":"summarize PR #412 and file a follow-up issue","mode":"toolpath"}'
+```
 
-To learn more about Next.js, take a look at the following resources:
+### Live HydraDB (optional)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+With `HYDRA_URL` unset the app runs in snapshot mode: same UI, same numbers,
+recorded from the seeded tool graph. To go live:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+export HYDRA_URL=http://127.0.0.1:8443
+export HYDRA_TOKEN=local-development-token-32-bytes
+export HYDRA_CELL=cell-0
+export HYDRA_GRAPH=default
+npm run dev
+```
 
-## Deploy on Vercel
+`/api/health` reports `{mode: "live"}` when the URL is set, `{mode: "snapshot"}`
+otherwise. Seed with `MERGE` or `UNWIND ... CREATE` only, `id` is the upsert key,
+plain single `CREATE` duplicates edges on rerun.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Screenshot
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Best screenshot first: the `/demo` traversal visualizer with metric cards,
+baseline vs toolpath compare table, and the lit path
+`Task -> Capability:repo/pr/issue -> repo_resolve/pr_read/issue_create`.
+(Capture at 1440x900 after running the demo task.)
+
+## Architecture
+
+```
+prompt -> POST /api/run {task, mode}
+  baseline: preload 40 schemas -> repo_list -> pr_read -> issue_list -> issue_create
+  toolpath: MATCH task -> capabilities (NEEDS)
+         -> CALL algo.MSpaths over PROVIDES edges (1 round trip)
+         -> hydrate 3 tool schemas only -> run -> write USED + RESOLVED edges
+  second query: RESOLVED entities reused, 0 refetch
+-> GET /api/graph returns nodes/edges for the SVG visualizer
+-> GET /api/health returns live or snapshot mode
+```
+
+## Track fit
+
+Track 2 asks for HydraDB as the live context store: skills, tool and MCP
+definitions, and resolved entities, with the agent traversing the graph instead
+of preloading everything. Toolpath is exactly that retrieval layer. Every token
+in context has a graph path behind it, which makes tool selection auditable in
+a way preloading and vector recall cannot match.
+
+## What we cut
+
+No auth, no multi-tenant, no write path beyond USED/RESOLVED edges, one seeded
+tool graph of 30 mock tools. Real HydraDB traversal is one env var away;
+snapshot mode keeps the Vercel demo judge-proof either way.
+
+## Demo script (60 seconds)
+
+- 0-15s: agents stuff 40 tool schemas into context before the first thought.
+- 15-45s: run the task, baseline vs toolpath numbers land side by side,
+  traversal path lights up.
+- 45-60s: follow-up query reuses entities with zero refetch.
+  Soundbite: traverse, don't preload.
