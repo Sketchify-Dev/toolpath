@@ -16,6 +16,7 @@ interface ComparePayload {
 
 const SAMPLE = "summarize PR #412 and file a follow-up issue";
 const FOLLOWUP = "what repo was that PR in?";
+const TIEBREAK = "find the Acme invoice"; // taste-skill-ignore: Acme is the deliberate ambiguous-entity fixture for the degree tie-break demo
 
 const TOOL_COLS = 8;
 
@@ -298,6 +299,16 @@ export default function DemoPage() {
           >
             Follow-up: entity reuse
           </button>
+          <button
+            onClick={() => {
+              setTask(TIEBREAK);
+              runDemo(TIEBREAK);
+            }}
+            className="inline-flex min-h-[44px] items-center rounded-full border px-4 py-1.5 transition-colors hover:border-[var(--accent)]"
+            style={{ borderColor: "var(--line)", color: "var(--muted)" }}
+          >
+            Ambiguous entity: tie-break
+          </button>
         </div>
 
         {result && (
@@ -515,6 +526,31 @@ export default function DemoPage() {
                 style={{ borderColor: "var(--line)", background: "var(--surface)" }}
               >
                 Reused entities: hydra/core, PR #412 from the previous run. Zero re-resolution.
+              </p>
+            ) : null}
+
+            {toolpath?.resolution ? (
+              <p
+                className="rounded-xl border px-4 py-3 text-sm"
+                style={{ borderColor: "var(--line)", background: "var(--surface)", color: "var(--muted)" }}
+              >
+                Entity tie-break: {toolpath.resolution.candidates} candidates for
+                &quot;Acme&quot;, kept{" "} {/* taste-skill-ignore: Acme is the deliberate ambiguous-entity fixture */}
+                <span className="demo-num" style={{ color: "var(--accent)", fontFamily: "var(--font-num)" }}>
+                  {toolpath.resolution.chosen}
+                </span>{" "}
+                by {toolpath.resolution.rule} (highest degree wins). No prompt guessing.
+              </p>
+            ) : null}
+
+            {toolpath?.degraded ? (
+              <p
+                className="rounded-xl border px-4 py-3 text-sm"
+                style={{ borderColor: "var(--warn)", background: "var(--surface)", color: "var(--muted)" }}
+              >
+                No capability matched this task, so the graph fell back to keyword
+                search over tool descriptions and loaded {toolpath.tools_used.length} tools
+                instead of 3. Still less than preloading {baseline?.metrics.tools_loaded}.
               </p>
             ) : null}
 

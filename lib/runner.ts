@@ -68,6 +68,7 @@ const TASK_CAPABILITY_MAP: Array<{ match: RegExp; caps: string[] }> = [
   { match: /summarize pr|pr #?\d+/i, caps: ["cap:repo", "cap:pr", "cap:issue"] },
   { match: /follow.?up issue/i, caps: ["cap:repo", "cap:pr", "cap:issue"] },
   { match: /what repo was that/i, caps: ["cap:repo", "cap:pr"] },
+  { match: /acme.*invoice|invoice.*acme/i, caps: ["cap:search", "cap:docs"] },
   { match: /invoice.*northwind/i, caps: ["cap:search", "cap:docs"] },
   { match: /same invoice.*cfo/i, caps: ["cap:search"] },
 ];
@@ -109,6 +110,9 @@ function summarize(task: string, mode: RunMode, tools: string[]): string {
   }
   if (/invoice.*northwind/i.test(task)) {
     return "Invoice #4471 for Northwind Traders ($18,204) emailed to billing@northwind.example.";
+  }
+  if (/acme.*invoice|invoice.*acme/i.test(task)) {
+    return "Invoice #9021 for Acme Corp ($7,450), due Friday. Two candidate Acme entities in the graph; kept acme-corp by degree, no prompt guessing."; // taste-skill-ignore: Acme is the deliberate ambiguous-entity fixture
   }
   if (/same invoice.*cfo/i.test(task)) {
     return "Invoice #4471 forwarded to the Northwind CFO, entity reused from run 1.";
@@ -237,7 +241,7 @@ export function runToolpath(task: string, sessionEntities: string[]): RunResult 
     ordered.reduce((acc, t) => acc + t.latencyMs, 0) + roundTrips * 80 + 40;
 
   const resolution =
-    /invoice.*acme/i.test(task)
+    /acme.*invoice|invoice.*acme/i.test(task)
       ? { candidates: 2, chosen: "acme-corp", rule: "degree" }
       : undefined;
   if (resolution) {
