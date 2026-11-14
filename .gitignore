@@ -39,3 +39,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# skills installer artifacts (global skills live in ~/.claude/skills)
+.skills/
+.skills.config.json
+skills-lock.json
+.agents/
+.claude/

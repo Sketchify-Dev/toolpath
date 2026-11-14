@@ -24,8 +24,8 @@ const jetbrainsMono = JetBrains_Mono({ // taste-skill-ignore: dealt data-termina
   weight: ["400", "500", "700"],
 });
 
-// Change to the production domain when deployed.
-export const SITE_URL = "https://toolpath.vercel.app";
+// Production domain.
+export const SITE_URL = "https://toolpath-five.vercel.app";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
