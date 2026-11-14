@@ -25,7 +25,7 @@ const STEPS = [
   {
     n: "03", // taste-skill-ignore: numbered steps in a sequence, not decoration
     title: "Hydrate only the path",
-    body: "Three tool schemas enter context. Resolved entities persist on TaskRun edges, so the next query reuses hydra/core and PR #412 with zero refetch.",
+    body: "Three tool schemas enter context. Resolved entities persist on TaskRun edges, so the next query reuses hydra/core and PR #412 with zero refetch. Ambiguous entities resolve by graph degree, not prompt guessing.",
     code: "MATCH (r)-[:RESOLVED]->(e)",
   },
 ];
@@ -365,7 +365,7 @@ export default function Home() {
                 </h2>
                 <p className="mt-2 max-w-xl leading-7 opacity-70">
                   Sixty seconds: run the task, watch baseline lose, ask the follow-up
-                  with zero refetch.
+                  with zero refetch, then break the tie on an ambiguous entity.
                 </p>
               </div>
               <Link
