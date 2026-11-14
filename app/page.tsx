@@ -13,19 +13,19 @@ const STEPS = [
   {
     n: "01", // taste-skill-ignore: numbered steps in a sequence, not decoration
     title: "Index the catalog",
-    body: "Tools, skills, MCP servers, capabilities, and resolved entities live as nodes in HydraDB. Edges say what provides what. One MERGE-only seed writes the whole graph.",
+    body: "Tools, skills, MCP servers, and resolved entities live as HydraDB nodes. Edges say what provides what. One MERGE-only seed writes the graph.",
     code: "MERGE (t:Tool {id: $id})",
   },
   {
     n: "02", // taste-skill-ignore: numbered steps in a sequence, not decoration
     title: "Ask for the path",
-    body: "One algo.MSpaths call resolves the task to capabilities to tools. No fan-out, no preloading forty schemas into context before the first thought.",
+    body: "One algo.MSpaths call resolves task to capability to tools. No fan-out, no preloading forty schemas into context first.",
     code: "CALL algo.MSpaths({...})",
   },
   {
     n: "03", // taste-skill-ignore: numbered steps in a sequence, not decoration
     title: "Hydrate only the path",
-    body: "Three tool schemas enter context. Resolved entities persist on TaskRun edges, so the next query reuses hydra/core and PR #412 with zero refetch. Ambiguous entities resolve by graph degree, not prompt guessing.",
+    body: "Three tool schemas enter context. Resolved entities persist on TaskRun edges, so follow-up queries reuse them with zero refetch.",
     code: "MATCH (r)-[:RESOLVED]->(e)",
   },
 ];
@@ -104,8 +104,8 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-20 px-6 pb-24 pt-14 sm:pt-20">
-        <section className="grid items-center gap-12 lg:grid-cols-2">
+      <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-16 px-6 pb-20 pt-10 sm:pt-16">
+        <section className="grid items-center gap-8 lg:grid-cols-2">
           <Rise>
             <p
               className="inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-xs font-medium"
@@ -118,17 +118,17 @@ export default function Home() {
               HydraDB Hackathon, Track 2: agent context layer
             </p>
             <h1
-              className="mt-6 text-2xl font-bold leading-[1.02] tracking-tight lg:text-3xl"
+              className="mt-4 text-2xl font-bold leading-[1.02] tracking-tight lg:text-3xl"
               style={{ fontFamily: "var(--font-display)" }}
             >
               Traverse, don&apos;t preload.
             </h1>
-            <p className="mt-6 max-w-md text-lg leading-8" style={{ color: "var(--muted)" }}>
+            <p className="mt-4 max-w-md text-lg leading-8" style={{ color: "var(--muted)" }}>
               Agents stuff forty tool schemas into context before the first thought.
               Toolpath walks the tool graph in HydraDB and pulls only the three the
               task needs.
             </p>
-            <div className="mt-8 flex flex-wrap items-center gap-4">
+            <div className="mt-6 flex flex-wrap items-center gap-4">
               <Link
                 href="/demo"
                 className="rounded-full px-7 py-3.5 text-sm font-semibold text-black transition-transform hover:scale-105"
@@ -145,7 +145,7 @@ export default function Home() {
               </Link>
             </div>
             <p
-              className="demo-num mt-6 text-sm"
+              className="demo-num mt-4 text-sm"
               style={{ color: "var(--muted)", fontFamily: "var(--font-num)" }}
             >
               1,800 tokens vs 12,400. Measured, not estimated.
@@ -254,7 +254,7 @@ export default function Home() {
               selection auditable in a way preloading and vector recall cannot match.
             </p>
           </Rise>
-          <div className="mt-8 grid gap-6 lg:grid-cols-3">
+          <div className="mt-8 grid gap-4 lg:grid-cols-3">
             {STEPS.map((s, i) => (
               <Rise key={s.title} index={i}>
                 <div
