@@ -2,12 +2,12 @@
 
 ![Toolpath demo: baseline vs toolpath traversal](https://toolpath-five.vercel.app/demo.png)
 
-Live demo: **https://toolpath-five.Opus.app/demo** (snapshot mode, no login, runs on load).
+Live demo: **https://toolpath-five.vercel.app/demo** (snapshot mode, no login, runs on load).
 
 Agent context layer on HydraDB, built for the HydraDB Hackathon, Track 2.
 
-Sponsor tech: **HydraDB** (graph store for tools, skills, MCP servers, entities),
-**OpenCypher** (task to capability to tool traversal), **algo.MSpaths**
+Sponsor tech: HydraDB (graph store for tools, skills, MCP servers, entities),
+OpenCypher (task to capability to tool traversal), algo.MSpaths
 (multi-source resolution in one round trip).
 
 Agents preload forty tool schemas into context and chain round trips. Toolpath

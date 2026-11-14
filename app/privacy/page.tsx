@@ -27,12 +27,12 @@ export default function PrivacyPage() {
           </Link>
         </div>
       </header>
-      <main className="mx-auto w-full max-w-3xl flex-1 px-6 py-14">
+      <main className="mx-auto w-full max-w-3xl flex-1 px-6 py-8">
         <p className="text-sm" style={{ color: "var(--muted)" }}>
           Last updated November 14, 2026
         </p>
         <h1
-          className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl"
+          className="mt-3 text-2xl font-bold tracking-tight sm:text-3xl"
           style={{ fontFamily: "var(--font-display)" }}
         >
           Privacy

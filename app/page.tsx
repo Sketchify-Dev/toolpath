@@ -387,6 +387,7 @@ export default function Home() {
           </div>
           <nav className="flex flex-wrap gap-1">
             <Link href="/demo" className="inline-flex min-h-[44px] items-center px-2 transition-colors hover:text-[var(--text)]">Demo</Link>
+            <Link href="/about" className="inline-flex min-h-[44px] items-center px-2 transition-colors hover:text-[var(--text)]">About</Link>
             <Link href="/privacy" className="inline-flex min-h-[44px] items-center px-2 transition-colors hover:text-[var(--text)]">Privacy</Link>
             <Link href="/sitemap.xml" className="inline-flex min-h-[44px] items-center px-2 transition-colors hover:text-[var(--text)]">Sitemap</Link>
             <Link href="/llms.txt" className="inline-flex min-h-[44px] items-center px-2 transition-colors hover:text-[var(--text)]">llms.txt</Link>
