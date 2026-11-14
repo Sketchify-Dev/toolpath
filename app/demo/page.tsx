@@ -215,6 +215,12 @@ export default function DemoPage() {
       </header>
 
       <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-6 px-6 py-6">
+        <h1
+          className="text-xl font-semibold tracking-tight sm:text-lg"
+          style={{ color: "var(--text)", fontFamily: "var(--font-display)" }}
+        >
+          Agent context layer demo
+        </h1>
         {snapshot && (
           <p
             className="rounded-xl border px-4 py-3 text-sm leading-6"
@@ -242,7 +248,7 @@ export default function DemoPage() {
           <label htmlFor="demo-task" className="px-1 text-sm font-medium" style={{ color: "var(--muted)" }}>
             Task for the agent
           </label>
-          <div className="flex gap-3">
+          <div className="flex flex-col sm:flex-row gap-3">
             <input
               id="demo-task"
               value={task}
@@ -256,7 +262,7 @@ export default function DemoPage() {
               placeholder="Ask the agent to do something..."
               aria-invalid={taskError ? true : undefined}
               aria-describedby={taskError ? "demo-task-error" : undefined}
-              className="demo-num min-h-[44px] min-w-0 flex-1 bg-transparent px-3 py-2 text-base outline-none disabled:opacity-50"
+              className="demo-num min-h-[44px] min-w-0 flex-1 bg-transparent px-3 py-2 text-sm sm:text-base outline-none disabled:opacity-50 overflow-x-auto"
               style={{ fontFamily: "var(--font-num)" }}
             />
             <button
@@ -424,11 +430,11 @@ export default function DemoPage() {
               </div>
 
               <div
-                className="flex flex-col rounded-2xl border p-4 lg:col-span-2"
+                className="flex flex-col self-start rounded-2xl border p-4 lg:col-span-2"
                 style={{ borderColor: "var(--line)", background: "var(--surface)" }}
               >
                 <h2 className="mb-2 text-base font-semibold">Run log</h2>
-                <div className="grid max-h-[320px] flex-1 auto-rows-min gap-1 overflow-y-auto text-xs leading-5">
+                <div className="grid max-h-[320px] flex-1 auto-rows-min gap-1 overflow-y-auto text-sm leading-5">
                   {log.map((line, i) => {
                     const isCypher = line.includes("[cypher]");
                     const body = line.replace(/^\S+ \[(graph|cypher|tool|llm|snapshot)\] /, "");

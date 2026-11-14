@@ -118,7 +118,7 @@ export default function Home() {
               HydraDB Hackathon, Track 2: agent context layer
             </p>
             <h1
-              className="mt-6 text-5xl font-bold leading-[1.02] tracking-tight sm:text-6xl lg:text-7xl"
+              className="mt-6 text-2xl font-bold leading-[1.02] tracking-tight lg:text-3xl"
               style={{ fontFamily: "var(--font-display)" }}
             >
               Traverse, don&apos;t preload.
@@ -258,7 +258,7 @@ export default function Home() {
             {STEPS.map((s, i) => (
               <Rise key={s.title} index={i}>
                 <div
-                  className="flex h-full flex-col rounded-2xl border p-6"
+                  className="flex self-start flex-col rounded-2xl border p-6"
                   style={{ background: "var(--surface)", borderColor: "var(--line)" }}
                 >
                   <p

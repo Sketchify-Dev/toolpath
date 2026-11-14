@@ -32,7 +32,7 @@ export default function PrivacyPage() {
           Last updated November 14, 2026
         </p>
         <h1
-          className="mt-3 text-4xl font-bold tracking-tight"
+          className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl"
           style={{ fontFamily: "var(--font-display)" }}
         >
           Privacy

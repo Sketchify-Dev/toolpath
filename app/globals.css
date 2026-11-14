@@ -11,6 +11,7 @@
   --card-bg: #f4f5f2;
   --card-text: #0b0c0e;
   --warn: #f2b84e;
+  --font-display: var(--font-geist-sans);
 }
 
 @theme inline {

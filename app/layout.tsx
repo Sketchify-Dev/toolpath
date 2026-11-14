@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Space_Grotesk, JetBrains_Mono } from "next/font/google"; // taste-skill-ignore: dealt data-terminal sheet mandates JetBrains Mono for all figures
+import { Geist, Geist_Mono, JetBrains_Mono } from "next/font/google"; // taste-skill-ignore: dealt data-terminal sheet mandates JetBrains Mono for all figures
 import "./globals.css";
 
 const geistSans = Geist({
@@ -10,12 +10,6 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({ // taste-skill-ignore: dealt data-terminal sheet mandates mono figures
   variable: "--font-geist-mono",
   subsets: ["latin"],
-});
-
-const spaceGrotesk = Space_Grotesk({
-  variable: "--font-display",
-  subsets: ["latin"],
-  weight: ["500", "600", "700"],
 });
 
 const jetbrainsMono = JetBrains_Mono({ // taste-skill-ignore: dealt data-terminal sheet mandates JetBrains Mono for all figures
@@ -88,7 +82,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable} h-full antialiased`} // taste-skill-ignore: mono figure variables per dealt sheet
+      className={`${geistSans.variable} ${geistMono.variable} ${jetbrainsMono.variable} h-full antialiased`} // taste-skill-ignore: mono figure variables per dealt sheet
     >
       <body className="min-h-full flex flex-col">
         <script
