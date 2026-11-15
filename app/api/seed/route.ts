@@ -29,11 +29,17 @@ export async function POST() {
     { run: "run:demo-pr412", tool: "tool:pr_read", cap: "cap:pr" },
     { run: "run:demo-pr412", tool: "tool:issue_create", cap: "cap:issue" },
   ];
+  const resolvedEntities = [
+    { run: "run:demo-pr412", entity: "entity:repo:hydra/core", kind: "repo", label: "hydra/core" },
+    { run: "run:demo-pr412", entity: "entity:pr:412", kind: "pr", label: "PR #412" },
+    { run: "run:demo-pr412", entity: "entity:issue:77", kind: "issue", label: "issue #77" },
+  ];
   try {
     await hydraQuery(SEED_STATEMENTS[0], { rows: tools });
     await hydraQuery(SEED_STATEMENTS[1], { rows: caps });
     await hydraQuery(SEED_STATEMENTS[2], { rows: provides });
     await hydraQuery(SEED_STATEMENTS[3], { rows: demoRun });
+    await hydraQuery(SEED_STATEMENTS[4], { rows: resolvedEntities });
     return NextResponse.json({
       data: {
         seeded: true,
@@ -41,6 +47,7 @@ export async function POST() {
         capabilities: caps.length,
         provides_edges: provides.length,
         run_edges: demoRun.length * 2,
+        resolved_entities: resolvedEntities.length,
       },
     });
   } catch (err) {

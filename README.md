@@ -2,7 +2,7 @@
 
 ![Toolpath demo: baseline vs toolpath traversal](https://toolpath-five.vercel.app/demo.png)
 
-Live demo: **https://toolpath-five.vercel.app/demo** (snapshot mode, no login, runs on load).
+Live demo: https://toolpath-five.vercel.app/demo (snapshot mode, no login, runs on load).
 
 Agent context layer on HydraDB, built for the HydraDB Hackathon, Track 2.
 
@@ -26,7 +26,7 @@ Open `http://localhost:3000/demo`. The page runs the demo task on load:
 
 1. Type or keep `summarize PR #412 and file a follow-up issue`, hit Run.
 2. Watch baseline (40 tools, ~12,400 tokens, 4 round trips) vs toolpath
-   (3 tools, 1,800 tokens, 3 round trips, 6 hops).
+   (3 tools, 1,800 tokens, 1 graph traversal + 3 tool calls, 6 hops).
 3. Hit `Follow-up: entity reuse`, the second query reuses hydra/core and
    PR #412 with zero refetch.
 4. Hit `Ambiguous entity: tie-break`: two candidates for "Acme", the graph
@@ -42,10 +42,14 @@ curl -s -X POST http://localhost:3000/api/run \
   --data '{"task":"summarize PR #412 and file a follow-up issue","mode":"toolpath"}'
 ```
 
-### Live HydraDB (optional)
+### Snapshot vs live mode
 
-With `HYDRA_URL` unset the app runs in snapshot mode: same UI, same numbers,
-recorded from the seeded tool graph. To go live:
+The deployed demo runs in snapshot mode: the local runner produces the baseline
+and toolpath results, and the graph visualizer renders from that output. Numbers
+are reproducible estimates, not live tokenizer measurements.
+
+With `HYDRA_URL` unset, `/api/health` reports `{mode: "snapshot"}` and the demo
+serves recorded runs from the seeded tool graph. To go live:
 
 ```bash
 export HYDRA_URL=http://127.0.0.1:8443
@@ -55,9 +59,10 @@ export HYDRA_GRAPH=default
 npm run dev
 ```
 
-`/api/health` reports `{mode: "live"}` when the URL is set, `{mode: "snapshot"}`
-otherwise. Seed with `MERGE` or `UNWIND ... CREATE` only, `id` is the upsert key,
-plain single `CREATE` duplicates edges on rerun.
+`/api/health` reports HydraDB connectivity. When `HYDRA_URL` is set, `/api/run`
+may issue a live HydraDB query, but `/api/compare` and `/api/graph` (used by the
+demo UI) continue to use the local runner. Seed with `MERGE` or `UNWIND ... MERGE`
+only, `id` is the upsert key, plain single `CREATE` duplicates edges on rerun.
 
 ## Screenshot
 
@@ -86,11 +91,11 @@ done | sort | uniq -c | head
 prompt -> POST /api/run {task, mode}
   baseline: preload 40 schemas -> repo_list -> pr_read -> issue_list -> issue_create
   toolpath: MATCH task -> capabilities (NEEDS)
-         -> CALL algo.MSpaths over PROVIDES edges (1 round trip)
+         -> CALL algo.MSpaths over PROVIDES edges (graph traversal)
          -> hydrate 3 tool schemas only -> run -> write USED + RESOLVED edges
   second query: RESOLVED entities reused, 0 refetch
 -> GET /api/graph returns nodes/edges for the SVG visualizer
--> GET /api/health returns live or snapshot mode
+-> GET /api/health returns snapshot mode and HydraDB connectivity
 ```
 
 ## Track fit
@@ -104,29 +109,45 @@ a way preloading and vector recall cannot match.
 ## What we cut
 
 No auth, no multi-tenant, no write path beyond USED/RESOLVED edges, one seeded
-tool graph of 30 mock tools. Real HydraDB traversal is one env var away;
-snapshot mode keeps the Vercel demo judge-proof either way.
+tool graph of 30 mock tools plus 10 ambient platform tools. The demo ships in
+snapshot mode so it works with zero setup; real HydraDB traversal is one env
+var away (HYDRA_URL) but the deployed demo does not depend on it.
 
 ## Judging criteria: technical implementation
 
 The HydraDB FAQ asks for three things. Here is how Toolpath answers each:
 
-**Right metrics, not vanity numbers.** Token count, tool count, round trips, and hops are measured from the runner on the live deployment, not estimated. 12,400 down to 1,800 (85 percent saved). 40 tools down to 3. 4 round trips down to 1 graph traversal. 6 hops instead of fan-out.
+**Right metrics, not vanity numbers.** Token count, tool count, round trips,
+and hops come from the runner. Token figures are documented estimates
+(300 tokens per schema, 200 per entity, 100 per round trip), not live
+tokenizer measurements. 12,400 down to 1,800 (85 percent saved). 40 tools
+down to 3. 4 round trips down to 1 graph traversal plus tool calls. 6 hops
+instead of fan-out.
 
-**Real continual-learning improvement plus a baseline.** The baseline preloads all 40 schemas and chains 4 round trips. Toolpath traverses once and hydrates only the 3 tools on the path. The follow-up query reuses hydra/core and PR #412 with zero refetch, because RESOLVED edges persist from the first run. That is genuine improvement over a defined baseline, not a one-off result.
+**Real continual-learning improvement plus a baseline.** The baseline preloads
+all 40 schemas and chains 4 round trips. Toolpath traverses once and hydrates
+only the 3 tools on the path. The follow-up query reuses hydra/core and PR #412
+with zero refetch, because RESOLVED edges persist from the first run. That is
+genuine improvement over a defined baseline, not a one-off result.
 
-**Impact of HydraDB and the graph.** The graph does real work: OpenCypher resolves task to capability to tool, and algo.MSpaths collapses multi-source resolution into one round trip. On a plain key-value store there is no traversal, no multi-source resolution, and no entity reuse across runs. The demo would fall apart without the graph.
+**Impact of HydraDB and the graph.** The graph does real work: OpenCypher
+resolves task to capability to tool, and algo.MSpaths collapses multi-source
+resolution into one round trip. On a plain key-value store there is no
+traversal, no multi-source resolution, and no entity reuse across runs. The
+demo would fall apart without the graph.
 
 ## Go-to-market
 
-**Who wants it.** Teams whose agents carry large tool catalogs: MCP servers, internal skills, platform APIs. If your system prompt lists tools the task never calls, that context has a graph path behind it here.
+**Who wants it.** Teams whose agents carry large tool catalogs: MCP servers,
+internal skills, platform APIs. If your system prompt lists tools the task
+never calls, that context has a graph path behind it here.
 
-**Product pitch.** Toolpath is an agent context layer that cuts context cost by 85 percent with one env var. Teams pay for tokens they do not use; Toolpath makes every token in context auditable through a graph path.
+**Product pitch.** Toolpath is an agent context layer that cuts context cost
+by 85 percent with one env var. Teams pay for tokens they do not use; Toolpath
+makes every token in context auditable through a graph path.
 
-**Social.** Post the live demo on Twitter and LinkedIn, tag the HydraDB account, and show the baseline-vs-toolpath numbers side by side.
-
-Live demo: https://toolpath-five.vercel.app/demo (snapshot mode, no login, runs on load).
-Repo: https://github.com/Sketchify-Dev/toolpath
+**Social.** Post the live demo on Twitter and LinkedIn, tag the HydraDB
+account, and show the baseline-vs-toolpath numbers side by side.
 
 ## Submission
 

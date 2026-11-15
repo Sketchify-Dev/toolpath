@@ -29,7 +29,6 @@ export default function DemoPage() {
   const [task, setTask] = useState(SAMPLE);
   const [mode, setMode] = useState<Mode>("both");
   const [loading, setLoading] = useState(false);
-  const [snapshot, setSnapshot] = useState(true);
   const [result, setResult] = useState<ComparePayload | null>(null);
   const [graph, setGraph] = useState<{ nodes: GraphNode[]; edges: GraphEdge[] } | null>(null);
   const [log, setLog] = useState<string[]>([]);
@@ -37,15 +36,9 @@ export default function DemoPage() {
   const [litStep, setLitStep] = useState(0);
   const timers = useRef<number[]>([]);
 
-  useEffect(() => {
-    fetch("/api/health")
-      .then((r) => r.json())
-      .then((j) => setSnapshot(j?.data?.mode !== "live"))
-      .catch(() => setSnapshot(true));
-    return () => {
-      timers.current.forEach((t) => window.clearTimeout(t));
-    };
-  }, []);
+  // The demo always runs in snapshot mode: /api/compare and /api/graph use the
+  // local runner, not HydraDB. /api/health reports connectivity separately and
+  // never implies the demo executed a live traversal.
 
   const streamLog = useCallback((lines: string[]) => {
     timers.current.forEach((t) => window.clearTimeout(t));
@@ -82,18 +75,14 @@ export default function DemoPage() {
             : mode === "toolpath"
               ? payload.toolpath.log
               : [...payload.baseline.log, "--- toolpath ---", ...payload.toolpath.log];
-        if (snapshot) {
-          streamLog([`[snapshot] recorded run from seeded tool graph`, ...lines]);
-        } else {
-          streamLog(lines);
-        }
+        streamLog([`[snapshot] recorded run from seeded tool graph`, ...lines]);
       } catch {
         setLog((prev) => [...prev, "[llm] run failed, try again"]);
       } finally {
         setLoading(false);
       }
     },
-    [mode, snapshot, streamLog],
+    [mode, streamLog],
   );
 
   useEffect(() => {
@@ -147,11 +136,11 @@ export default function DemoPage() {
             <span
               className="rounded-full px-3 py-1 text-xs font-semibold"
               style={{
-                background: snapshot ? "var(--warn)" : "var(--accent)",
+                background: "var(--warn)",
                 color: "#0b0c0e",
               }}
             >
-              {snapshot ? "Snapshot mode" : "Live"}
+              Snapshot mode (recorded)
             </span>
           </div>
           <div
@@ -199,15 +188,10 @@ export default function DemoPage() {
               Run a task and watch Toolpath traverse the graph instead of preloading schemas.
             </p>
           </div>
-          {snapshot && (
-            <p
-              className="rounded-xl border px-4 py-3 text-sm leading-6 flex-shrink-0"
-              style={{ borderColor: "var(--line)", background: "var(--surface)", color: "var(--muted)" }}
-            >
-              Live HydraDB unreachable. Showing a recorded run from the seeded tool graph. Numbers
-              are real, just not live. Set HYDRA_URL to flip this badge to Live.
-            </p>
-          )}
+          <p className="rounded-xl border px-4 py-3 text-sm leading-6 flex-shrink-0" style={{ borderColor: "var(--line)", background: "var(--surface)", color: "var(--muted)" }}>
+            Snapshot mode: showing a recorded run from the seeded tool graph. Numbers are real,
+            just not live. Set HYDRA_URL to enable live HydraDB queries in /api/run.
+          </p>
         </div>
 
         <form
@@ -349,7 +333,7 @@ export default function DemoPage() {
                     <strong>Traversal hops:</strong> edges crossed in the graph traversal. Toolpath: capability-to-tool edges. Baseline: 0 (no graph used).
                   </li>
                   <li>
-                    <strong>Mode:</strong> {snapshot ? "Snapshot (recorded run from seeded graph)" : "Live HydraDB"}.
+                    <strong>Mode:</strong> Snapshot (recorded run from seeded graph).
                   </li>
                 </ul>
               </div>

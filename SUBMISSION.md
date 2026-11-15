@@ -1,8 +1,9 @@
 # Toolpath: submission copy
 
 Track 2, agent context layer on HydraDB. Copy-paste ready for the
-hackathon submission form. Every number below is measured on the live
-deployment, not estimated.
+hackathon submission form. Numbers below are documented estimates from the
+runner (300 tokens per schema, 200 per entity, 100 per round trip), not live
+tokenizer measurements. The deployed demo runs in snapshot mode.
 
 ## One-line pitch
 
@@ -31,7 +32,7 @@ on the path enter context.
 - **algo.MSpaths**: multi-source capability resolution in one round trip
   instead of fan-out.
 
-## Measured results (live deployment)
+## Results (documented estimates from the runner)
 
 - 12,400 tokens down to 1,800 (85 percent) on the demo task.
 - 40 tools preloaded down to 3 hydrated.
@@ -56,9 +57,9 @@ snapshot mode so it works with zero setup).
 ## Judging criteria: technical implementation
 
 **Right metrics.** Token count, tool count, round trips, and hops are
-measured on the live deployment, not estimated. 12,400 down to 1,800
-(85 percent). 40 tools down to 3. 4 round trips down to 1 graph
-traversal. 6 hops.
+documented estimates from the runner, not live tokenizer measurements.
+12,400 down to 1,800 (85 percent). 40 tools down to 3. 4 round trips
+down to 1 graph traversal. 6 hops.
 
 **Continual-learning improvement plus baseline.** The baseline preloads
 all 40 schemas and chains 4 round trips. Toolpath traverses once and
@@ -87,8 +88,9 @@ account, and show the baseline-vs-toolpath numbers side by side.
 ## What we cut (honest scope)
 
 No auth, no multi-tenant, no write path beyond USED/RESOLVED edges, one
-seeded graph of 30 mock tools. Real HydraDB traversal is one env var
-away (HYDRA_URL); snapshot mode keeps the demo judge-proof either way.
+seeded graph of 30 mock tools. The deployed demo runs in snapshot mode;
+real HydraDB traversal is one env var away (HYDRA_URL) but is not
+required for the demo to function.
 
 ## Next if funded
 
