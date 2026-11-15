@@ -54,6 +54,15 @@ on the path enter context.
 Live: https://toolpath-five.vercel.app/demo (no login, runs on load,
 snapshot mode so it works with zero setup).
 
+## Demo film (90 seconds)
+
+A cinematic hybrid product film is in `video/toolpath-demo-final.mp4`
+(1920x1080, 30fps, with AI voiceover, soundtrack, SFX, and burned-in
+subtitles). Editable Remotion source and production report are in
+`video/`. Scenes: Hook, Problem, Intro, Traversal, Demo (real footage),
+Numbers, Honesty, Closing.
+
+
 ## Judging criteria: technical implementation
 
 **Right metrics.** Token count, tool count, round trips, and hops are

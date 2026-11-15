@@ -1,0 +1,23 @@
+[Script Info]
+Title: Toolpath Demo Subtitles
+Original Script: Toolpath
+WrapStyle: 0
+ScaledBorderAndShadow: yes
+YCbCr Matrix: TV.601
+PlayResX: 1920
+PlayResY: 1080
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Default,Geist,26,&H00FFFFFF,&H000000FF,&H00000000,&H80000000,0,0,0,0,100,100,0,0,1,1,0,2,60,60,60,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:00.00,0:00:08.00,Default,,0,0,0,,Most agents don't have a tool problem. They have a context problem.
+Dialogue: 0,0:00:08.00,0:00:19.00,Default,,0,0,0,,Before a task even begins, an agent can load dozens of tool schemas it may never use. Forty tools, twelve thousand four hundred estimated context tokens, for a task that only needs a few.
+Dialogue: 0,0:00:19.00,0:00:29.00,Default,,0,0,0,,Toolpath takes a different approach. It models tools, capabilities, and entities as a graph, then resolves the path a task actually needs. Traverse, don't preload.
+Dialogue: 0,0:00:29.00,0:00:41.00,Default,,0,0,0,,A task maps to capabilities. Graph traversal identifies the matching tools. Only those tools need to enter context. Three capabilities, three tools, one graph traversal, six hops.
+Dialogue: 0,0:00:41.00,0:01:04.00,Default,,0,0,0,,Let's run the demo. The baseline preloads forty tools and estimates twelve thousand four hundred context tokens. Toolpath identifies three relevant tools: repository resolution, pull request reading, and issue creation. The graph makes that selection inspectable, and the execution log shows how the task progresses.
+Dialogue: 0,0:01:04.00,0:01:16.00,Default,,0,0,0,,The result: one thousand eight hundred estimated context tokens instead of twelve thousand four hundred. An estimated reduction of around eighty-five percent.
+Dialogue: 0,0:01:16.00,0:01:24.00,Default,,0,0,0,,The deployed demonstration uses a recorded snapshot, and the token figures are reproducible estimates, not live tokenizer measurements. Less unnecessary context. More deliberate tool selection.
+Dialogue: 0,0:01:24.00,0:01:30.00,Default,,0,0,0,,Toolpath. Traverse, don't preload.
