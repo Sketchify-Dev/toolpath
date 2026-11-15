@@ -167,7 +167,7 @@ export default function Home() {
             className="mt-6 text-5xl font-bold leading-[1.02] tracking-tight sm:text-6xl lg:text-7xl"
             style={{ fontFamily: "var(--font-display)" }}
           >
-            Traverse, don&apos;t preload.
+            Traverse, don't preload.
           </h1>
           <p className="mt-7 max-w-2xl text-lg leading-8" style={{ color: "var(--text-dim)" }}>
             Agents stuff forty tool schemas into context before the first thought.

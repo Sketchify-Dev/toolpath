@@ -43,7 +43,7 @@ export default function PrivacyPage() {
             to sign up for and nothing tracking you across the page.
           </p>
           <p>
-            Tasks you type into the demo are sent to this site&apos;s own API
+            Tasks you type into the demo are sent to this site's own API
             routes to run the baseline and toolpath comparison. In snapshot mode
             nothing leaves the server; in live mode queries go to the HydraDB
             instance configured by the site operator. Do not paste secrets, tokens,

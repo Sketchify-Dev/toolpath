@@ -56,7 +56,6 @@ body {
   color: var(--text);
   font-family: var(--font-display), Arial, Helvetica, sans-serif;
   line-height: 1.6;
-  letter-spacing: -0.01em;
   overflow-x: hidden;
 }
 

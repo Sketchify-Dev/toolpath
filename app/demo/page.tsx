@@ -180,7 +180,7 @@ export default function DemoPage() {
         {result === null && !loading && (
           <div className="card p-12 text-center" style={{ color: "var(--text-dim)" }}>
             <p className="text-lg">Ready to run.</p>
-            <p className="mt-2 text-sm">Press "Run task" to start the demo, or wait for the automatic sample run.</p>
+            <p className="mt-2 text-sm">The sample run starts automatically. Press 'Run task' to run a different task.</p>
           </div>
         )}
 
