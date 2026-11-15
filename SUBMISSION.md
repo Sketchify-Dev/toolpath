@@ -50,7 +50,7 @@ on the path enter context.
 4. 50-60s: ambiguous entity resolves by degree.
    Soundbite: traverse, don't preload.
 
-Live: https://toolpath-five.brewkeg-haiku.app/demo (no login, runs on load,
+Live: https://toolpath-five.vercel.app/demo (no login, runs on load,
 snapshot mode so it works with zero setup).
 
 ## Judging criteria: technical implementation
