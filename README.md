@@ -1,8 +1,8 @@
 # Toolpath: traverse, don't preload
 
-![Toolpath demo: baseline vs toolpath traversal](https://hydradb.brewkeg-haiku.app/demo.png)
+![Toolpath demo: baseline vs toolpath traversal](https://hydradb.vercel.app/demo.png)
 
-Live demo: **https://hydradb.brewkeg-haiku.app/demo** (snapshot mode, no login, runs on load).
+Live demo: **https://hydradb.vercel.app/demo** (snapshot mode, no login, runs on load).
 
 Agent context layer on HydraDB, built for the HydraDB Hackathon, Track 2.
 
@@ -76,7 +76,7 @@ synchronous and allocation-free). Reproduce with:
 ```bash
 for i in $(seq 1 60); do
   curl -s -o /dev/null -w "%{http_code} %{time_total}\n" \
-    "https://hydradb.brewkeg-haiku.app/api/compare?task=summarize%20PR%20%23412"
+    "https://hydradb.vercel.app/api/compare?task=summarize%20PR%20%23412"
 done | sort | uniq -c | head
 ```
 
@@ -125,12 +125,12 @@ The HydraDB FAQ asks for three things. Here is how Toolpath answers each:
 
 **Social.** Post the live demo on Twitter and LinkedIn, tag the HydraDB account, and show the baseline-vs-toolpath numbers side by side.
 
-Live demo: https://hydradb.brewkeg-haiku.app/demo (snapshot mode, no login, runs on load).
+Live demo: https://hydradb.vercel.app/demo (snapshot mode, no login, runs on load).
 Repo: https://github.com/Sketchify-Dev/toolpath
 
 ## Submission
 
-- Live link: https://hydradb.brewkeg-haiku.app/demo
+- Live link: https://hydradb.vercel.app/demo
 - GitHub repo: https://github.com/Sketchify-Dev/toolpath
 - Loom: 60-second walkthrough of the demo (see Demo script below)
 - Cutoff: 9 AM IST, Nov 16, 2026
