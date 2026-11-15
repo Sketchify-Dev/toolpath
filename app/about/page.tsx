@@ -58,7 +58,7 @@ export default function AboutPage() {
             <p className="text-lg">
               Built for the HydraDB Hackathon, Track 2: agent context layer. The
               demo runs in snapshot mode by default, so it works with zero setup.
-              Set HYDRA_URL to flip to live HydraDB traversal.
+              Set HYDRA_URL to enable live HydraDB queries in /api/run; the demo UI continues to run from the local runner.
             </p>
             <h2 className="mt-12 text-3xl font-bold tracking-tight" style={{ fontFamily: "var(--font-display)" }}>
               Sponsor tech

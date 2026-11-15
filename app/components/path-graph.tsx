@@ -197,12 +197,12 @@ export default function PathGraph({ nodes, edges, activePath }: {
                 x={x}
                 y={y + r + 12}
                 textAnchor="middle"
-                fill="var(--muted)"
-                fontSize={6.5}
+                fill={loaded || isActive ? "var(--text-dim)" : "var(--muted)"}
+                fontSize={7}
                 fontFamily="var(--font-mono)"
                 fontWeight={500}
                 pointerEvents="none"
-                style={{ opacity: loaded || isActive ? 0.7 : 0.3 }}
+                style={{ opacity: loaded || isActive ? 0.9 : 0.5 }}
               >
                 [{typeLabel(n.type)}]
               </text>

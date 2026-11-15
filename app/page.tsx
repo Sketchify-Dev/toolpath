@@ -65,7 +65,7 @@ const ACTIVE_PATH = ["task:run", "cap:repo", "cap:pr", "cap:issue", "tool:repo_r
 const FAQS = [
   {
     q: "Does this need a live HydraDB to demo?",
-    a: "No. With HYDRA_URL unset the app serves a recorded run from the seeded tool graph, same UI and same numbers. Set one env var and /api/health flips to live.",
+    a: "No. With HYDRA_URL unset the app serves a recorded run from the seeded tool graph, same UI and same numbers. /api/health reports the snapshot mode and HydraDB connectivity separately; it does not switch the demo to live execution.",
   },
   {
     q: "Where do the token numbers come from?",
@@ -166,7 +166,7 @@ export default function Home() {
                     {p.value}
                   </p>
                   <p className="mt-2 text-sm font-semibold">{p.unit}</p>
-                  <p className="mt-1 text-xs opacity-70">{p.note}</p>
+                  <p className="mt-1 text-xs font-medium">{p.note}</p>
                 </div>
               ))}
             </div>
@@ -249,7 +249,7 @@ export default function Home() {
                   {p.value}
                 </p>
                 <p className="mt-3 text-sm font-semibold">{p.unit}</p>
-                <p className="mt-1 text-xs opacity-60">{p.note}</p>
+                <p className="mt-1 text-xs font-medium">{p.note}</p>
               </div>
             ))}
           </div>

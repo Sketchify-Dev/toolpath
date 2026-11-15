@@ -302,12 +302,12 @@ export default function DemoPage() {
                   const pct = b > 0 ? Math.round((saved / b) * 100) : 0;
                   return (
                     <div key={m.k} className="card-light p-6">
-                      <p className="text-sm" style={{ color: "var(--muted)" }}>{m.k}</p>
+                      <p className="text-sm font-medium">{m.k}</p>
                       <div className="mt-3 flex items-baseline justify-between">
-                        <span className="demo-num text-3xl font-bold" style={{ color: "var(--accent)", fontFamily: "var(--font-num)" }}>
+                        <span className="demo-num text-3xl font-bold" style={{ fontFamily: "var(--font-num)" }}>
                           {t.toLocaleString()}
                         </span>
-                        <span className="text-xs" style={{ color: "var(--text-dim)" }}>
+                        <span className="text-xs">
                           baseline {b.toLocaleString()} (-{pct}%)
                         </span>
                       </div>
