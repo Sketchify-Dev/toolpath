@@ -90,7 +90,7 @@ export default function DemoPage() {
       runDemo(SAMPLE);
     }, 0);
     return () => window.clearTimeout(id);
-  }, []);
+  }, [runDemo]);
 
   const baseline = result?.baseline;
   const toolpath = result?.toolpath;
@@ -111,44 +111,33 @@ export default function DemoPage() {
 
   return (
     <div className="flex min-h-full flex-col relative overflow-hidden">
-      <div className="fixed inset-0 -z-10 grid-bg opacity-25 pointer-events-none" />
+      <div className="fixed inset-0 -z-10 grid-bg opacity-15 pointer-events-none" />
 
       <header
         className="sticky top-0 z-50 border-b"
         style={{
           borderColor: "var(--line)",
-          background: "color-mix(in srgb, var(--bg) 75%, transparent)",
-          backdropFilter: "blur(14px)",
-          WebkitBackdropFilter: "blur(14px)",
+          background: "color-mix(in srgb, var(--bg) 85%, transparent)",
+          backdropFilter: "blur(12px)",
+          WebkitBackdropFilter: "blur(12px)",
         }}
       >
         <div className="mx-auto flex w-full max-w-7xl flex-wrap items-center justify-between gap-4 px-6 py-3 sm:px-8">
           <div className="flex items-center gap-2">
             <Link href="/" className="flex min-h-[44px] items-center gap-2.5" aria-label="Toolpath home">
               <LogoMark size={24} />
-              <span
-                className="text-lg font-bold tracking-tight"
-                style={{ fontFamily: "var(--font-display)" }}
-              >
+              <span className="text-lg font-bold tracking-tight" style={{ fontFamily: "var(--font-display)" }}>
                 Toolpath
               </span>
             </Link>
-            <span
-              className="rounded-full px-3 py-1 text-xs font-semibold"
-              style={{
-                background: "var(--warn)",
-                color: "#0b0c0e",
-              }}
-            >
+            <span className="rounded-full px-3 py-1 text-xs font-semibold" style={{
+              background: "var(--warn)",
+              color: "#0B1220",
+            }}>
               Snapshot mode (recorded)
             </span>
           </div>
-          <div
-            className="flex rounded-full border p-1 text-sm"
-            style={{ borderColor: "var(--line)", background: "var(--surface)" }}
-            role="tablist"
-            aria-label="Run mode"
-          >
+          <div className="flex rounded-full border p-1 text-sm" style={{ borderColor: "var(--line)", background: "var(--surface-lift)" }} role="tablist" aria-label="Run mode">
             {(["baseline", "toolpath", "both"] as Mode[]).map((m) => (
               <button
                 key={m}
@@ -158,7 +147,7 @@ export default function DemoPage() {
                 className="min-h-[44px] rounded-full px-4 py-1.5 font-medium transition-colors"
                 style={
                   mode === m
-                    ? { background: "var(--accent)", color: "#0b0c0e" }
+                    ? { background: "var(--accent)", color: "#0B1220" }
                     : { color: "var(--muted)" }
                 }
               >
@@ -166,10 +155,7 @@ export default function DemoPage() {
               </button>
             ))}
           </div>
-          <Link
-            href="/"
-            className="btn btn-ghost shrink-0"
-          >
+          <Link href="/" className="btn btn-ghost shrink-0">
             Back to home
           </Link>
         </div>
@@ -178,21 +164,25 @@ export default function DemoPage() {
       <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-8 px-6 py-8 sm:px-8 lg:px-10">
         <div className="flex items-center justify-between gap-4">
           <div>
-            <h1
-              className="text-4xl font-bold leading-[1.05] tracking-tight sm:text-5xl"
-              style={{ color: "var(--text)", fontFamily: "var(--font-display)" }}
-            >
+            <h1 className="text-4xl font-bold leading-[1.05] tracking-tight sm:text-5xl" style={{ color: "var(--text)", fontFamily: "var(--font-display)" }}>
               Agent context layer demo
             </h1>
             <p className="mt-2 text-lg" style={{ color: "var(--text-dim)" }}>
               Run a task and watch Toolpath traverse the graph instead of preloading schemas.
             </p>
           </div>
-          <p className="rounded-xl border px-4 py-3 text-sm leading-6 flex-shrink-0" style={{ borderColor: "var(--line)", background: "var(--surface)", color: "var(--muted)" }}>
+          <p className="rounded-xl border px-4 py-3 text-sm leading-6 flex-shrink-0" style={{ borderColor: "var(--line)", background: "var(--surface-lift)", color: "var(--text-dim)" }}>
             Snapshot mode: showing a recorded run from the seeded tool graph. Numbers are real,
             just not live. Set HYDRA_URL to enable live HydraDB queries in /api/run.
           </p>
         </div>
+
+        {result === null && !loading && (
+          <div className="card p-12 text-center" style={{ color: "var(--text-dim)" }}>
+            <p className="text-lg">Ready to run.</p>
+            <p className="mt-2 text-sm">Press "Run task" to start the demo, or wait for the automatic sample run.</p>
+          </div>
+        )}
 
         <form
           className="rounded-2xl border p-3 glass"
@@ -237,11 +227,10 @@ export default function DemoPage() {
         {result && (
           <>
             <div className="grid gap-8 lg:grid-cols-3">
-              {/* Graph visualization */}
               <div className="lg:col-span-2">
                 <div className="card p-6">
                   <div className="flex items-center gap-3 mb-5">
-                    <div className="w-8 h-8 rounded-lg bg-surface flex items-center justify-center" style={{ border: "1px solid var(--line)" }}>
+                    <div className="w-8 h-8 rounded-lg bg-surface-lift flex items-center justify-center" style={{ border: "1px solid var(--line)" }}>
                       <span className="text-xs font-bold" style={{ color: "var(--accent)", fontFamily: "var(--font-display)" }}>T</span>
                     </div>
                     <h2 className="text-base font-semibold" style={{ fontFamily: "var(--font-display)" }}>
@@ -255,7 +244,6 @@ export default function DemoPage() {
                 </div>
               </div>
 
-              {/* Log panel */}
               <div className="lg:col-span-1">
                 <div className="card p-0 overflow-hidden">
                   <div className="border-b border-[var(--line)] bg-surface-lift px-5 py-4">
@@ -280,7 +268,7 @@ export default function DemoPage() {
                           }}
                         >
                           <span style={{ color: tagColor(line) }}>{tagLabel(line)}</span>{" "}
-                          <span style={{ opacity: 0.5 }}>{line.slice(line.indexOf("]") + 1).trim()}</span>
+                          <span>{line.slice(line.indexOf("]") + 1).trim()}</span>
                         </div>
                       );
                     })}
@@ -289,7 +277,6 @@ export default function DemoPage() {
               </div>
             </div>
 
-            {/* Metrics comparison */}
             <section className="border-t border-[var(--line)] pt-8">
               <h2 className="text-3xl font-bold tracking-tight mb-8" style={{ fontFamily: "var(--font-display)" }}>
                 Baseline versus toolpath
@@ -307,7 +294,7 @@ export default function DemoPage() {
                         <span className="demo-num text-3xl font-bold" style={{ fontFamily: "var(--font-num)" }}>
                           {t.toLocaleString()}
                         </span>
-                        <span className="text-xs">
+                        <span className="text-xs" style={{ color: "var(--muted)" }}>
                           baseline {b.toLocaleString()} (-{pct}%)
                         </span>
                       </div>
@@ -333,18 +320,17 @@ export default function DemoPage() {
                     <strong>Traversal hops:</strong> edges crossed in the graph traversal. Toolpath: capability-to-tool edges. Baseline: 0 (no graph used).
                   </li>
                   <li>
-                    <strong>Mode:</strong> Snapshot (recorded run from seeded graph).
+                    <strong>Mode:</strong> Snapshot (recorded run from seeded graph). Entity reuse is cached in-session, not durable across server restarts.
                   </li>
                 </ul>
               </div>
             </section>
 
-            {/* Entity reuse / tie-break notices */}
             <div className="mt-8 grid gap-4">
               {(toolpath?.entities_reused ?? 0) > 0 || toolpath?.metrics.cache_hit ? (
                 <div className="card p-5">
                   <p className="text-sm leading-6" style={{ color: "var(--text)" }}>
-                    Reused entities: hydra/core, PR #412 from the previous run. Zero re-resolution.
+                    Reused entities: hydra/core, PR #412 from the previous run. Zero re-resolution within this session.
                   </p>
                 </div>
               ) : null}
@@ -353,7 +339,7 @@ export default function DemoPage() {
                 <div className="card p-5">
                   <p className="text-sm leading-6" style={{ color: "var(--text)" }}>
                     Entity tie-break: {toolpath.resolution.candidates} candidates for
-                    &quot;Acme&quot;, kept{" "}
+                    "Acme", kept{" "}
                     <span className="demo-num" style={{ color: "var(--accent)", fontFamily: "var(--font-num)" }}>
                       {toolpath.resolution.chosen}
                     </span>{" "}
@@ -373,7 +359,6 @@ export default function DemoPage() {
               ) : null}
             </div>
 
-            {/* Result */}
             <section className="mt-8">
               <div className="card p-7">
                 <h2 className="text-base font-semibold mb-4" style={{ fontFamily: "var(--font-display)" }}>

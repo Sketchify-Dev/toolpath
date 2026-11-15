@@ -15,11 +15,11 @@ function typeColor(type: GraphNode["type"]): string {
 
 function nodeRadius(type: GraphNode["type"]): number {
   switch (type) {
-    case "task": return 20;
-    case "capability": return 15;
-    case "tool": return 11;
-    case "entity": return 13;
-    default: return 11;
+    case "task": return 18;
+    case "capability": return 13;
+    case "tool": return 10;
+    case "entity": return 12;
+    default: return 10;
   }
 }
 
@@ -53,20 +53,20 @@ export default function PathGraph({ nodes, edges, activePath }: {
     if (!el) return;
     const ro = new ResizeObserver(() => {
       const r = el.getBoundingClientRect();
-      setSvgSize({ w: Math.max(r.width, 320), h: Math.max(r.height, 260) });
+      setSvgSize({ w: r.width, h: Math.max(r.height, 240) });
     });
     ro.observe(el);
     return () => ro.disconnect();
   }, []);
 
   const w = svgSize.w || 640;
-  const h = svgSize.h || 280;
+  const h = svgSize.h || 260;
 
   const layout = useMemo(() => computeLayout(nodes, w, h), [nodes, w, h]);
   const nodeById = useMemo(() => new Map(nodes.map((n) => [n.id, n])), [nodes]);
 
   return (
-    <div ref={containerRef} className="w-full h-full min-h-[280px] relative">
+    <div ref={containerRef} className="w-full h-full min-h-[260px] relative">
       <svg
         width={w}
         height={h}
@@ -96,13 +96,8 @@ export default function PathGraph({ nodes, edges, activePath }: {
           >
             <path d="M0,0 L0,9 L9,4.5 z" fill="var(--accent)" />
           </marker>
-          <filter id="nodeGlow" x="-40%" y="-40%" width="180%" height="180%">
-            <feGaussianBlur stdDeviation="3" result="blur" />
-            <feComposite in="SourceGraphic" in2="blur" operator="over" />
-          </filter>
         </defs>
 
-        {/* Edges - drawn first so they sit behind nodes */}
         {edges.map((e, i) => {
           const isActive = activePath.includes(e.from) && activePath.includes(e.to);
           const from = layout.get(e.from);
@@ -119,7 +114,6 @@ export default function PathGraph({ nodes, edges, activePath }: {
           const x2 = to.x - (dx / dist) * rTo;
           const y2 = to.y - (dy / dist) * rTo;
 
-          // Slight curve for visual polish
           const midX = (x1 + x2) / 2;
           const midY = (y1 + y2) / 2;
           const perpX = -dy / dist;
@@ -137,12 +131,10 @@ export default function PathGraph({ nodes, edges, activePath }: {
               strokeWidth={isActive ? 2.5 : 1}
               strokeOpacity={isActive ? 1 : 0.3}
               marker-end={isActive ? "url(#arrow-active)" : "url(#arrow)"}
-              className={isActive ? "path-lit" : ""}
             />
           );
         })}
 
-        {/* Nodes */}
         {nodes.map((n) => {
           const isActive = activePath.includes(n.id);
           const { x, y } = layout.get(n.id) ?? { x: 0, y: 0 };
@@ -152,18 +144,6 @@ export default function PathGraph({ nodes, edges, activePath }: {
 
           return (
             <g key={n.id}>
-              {/* Subtle ring for inactive nodes */}
-              {!isActive && !loaded && (
-                <circle
-                  cx={x}
-                  cy={y}
-                  r={r + 4}
-                  fill="none"
-                  stroke="var(--line)"
-                  strokeWidth={1}
-                  strokeOpacity={0.25}
-                />
-              )}
               <circle
                 cx={x}
                 cy={y}
@@ -171,7 +151,6 @@ export default function PathGraph({ nodes, edges, activePath }: {
                 fill={isActive ? col : loaded ? "var(--surface-lift)" : "var(--bg)"}
                 stroke={isActive ? col : loaded ? "var(--line)" : "var(--line)"}
                 strokeWidth={isActive ? 3 : loaded ? 1.5 : 1}
-                filter={isActive ? "url(#nodeGlow)" : undefined}
                 style={{
                   transition: "all 450ms cubic-bezier(0.25, 1, 0.5, 1)",
                   opacity: loaded || isActive ? 1 : 0.45,
@@ -181,15 +160,12 @@ export default function PathGraph({ nodes, edges, activePath }: {
                 x={x}
                 y={y + 4}
                 textAnchor="middle"
-                fill={isActive ? "#0b0c0e" : loaded ? "var(--text)" : "var(--text-dim)"}
-                fontSize={n.type === "task" ? 11 : n.type === "capability" ? 9 : 7.5}
+                fill={isActive ? "#0B1220" : loaded ? "var(--text)" : "var(--text-dim)"}
+                fontSize={n.type === "task" ? 10 : n.type === "capability" ? 8 : 7}
                 fontFamily="var(--font-display)"
                 fontWeight={isActive ? 700 : loaded ? 600 : 500}
                 letterSpacing="-0.02em"
                 pointerEvents="none"
-                style={{
-                  transition: "all 450ms cubic-bezier(0.25, 1, 0.5, 1)",
-                }}
               >
                 {n.label}
               </text>
@@ -198,11 +174,10 @@ export default function PathGraph({ nodes, edges, activePath }: {
                 y={y + r + 12}
                 textAnchor="middle"
                 fill={loaded || isActive ? "var(--text-dim)" : "var(--muted)"}
-                fontSize={7}
+                fontSize={8}
                 fontFamily="var(--font-mono)"
                 fontWeight={500}
                 pointerEvents="none"
-                style={{ opacity: loaded || isActive ? 0.9 : 0.5 }}
               >
                 [{typeLabel(n.type)}]
               </text>
@@ -211,14 +186,10 @@ export default function PathGraph({ nodes, edges, activePath }: {
         })}
       </svg>
 
-      {/* Legend */}
       <div className="absolute bottom-3 left-3 flex gap-3 text-xs text-muted">
         {LEGEND_ITEMS.map(([type, color]) => (
           <span key={type} className="flex items-center gap-1.5">
-            <span
-              className="w-2 h-2 rounded-full"
-              style={{ background: color }}
-            />
+            <span className="w-2 h-2 rounded-full" style={{ background: color }} />
             {type}
           </span>
         ))}
