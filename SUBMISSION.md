@@ -53,6 +53,37 @@ on the path enter context.
 Live: https://toolpath-five.vercel.app/demo (no login, runs on load,
 snapshot mode so it works with zero setup).
 
+## Judging criteria: technical implementation
+
+**Right metrics.** Token count, tool count, round trips, and hops are
+measured on the live deployment, not estimated. 12,400 down to 1,800
+(85 percent). 40 tools down to 3. 4 round trips down to 1 graph
+traversal. 6 hops.
+
+**Continual-learning improvement plus baseline.** The baseline preloads
+all 40 schemas and chains 4 round trips. Toolpath traverses once and
+hydrates only the 3 tools on the path. Follow-up queries reuse RESOLVED
+entities with zero refetch, genuine improvement over a defined baseline.
+
+**Graph impact.** OpenCypher traverses task to capability to tool.
+algo.MSpaths resolves multi-source in one round trip. RESOLVED edges
+persist across runs. On a plain key-value store there is no traversal,
+no multi-source resolution, and no entity reuse, the demo falls apart
+without the graph.
+
+## Go-to-market
+
+**Who wants it.** Teams whose agents carry large tool catalogs: MCP
+servers, internal skills, platform APIs. If your system prompt lists
+tools the task never calls, that context has a graph path behind it here.
+
+**Product pitch.** Toolpath is an agent context layer that cuts context
+cost by 85 percent with one env var. Teams pay for tokens they do not
+use; Toolpath makes every token in context auditable through a graph path.
+
+**Social.** Post the live demo on Twitter and LinkedIn, tag the HydraDB
+account, and show the baseline-vs-toolpath numbers side by side.
+
 ## What we cut (honest scope)
 
 No auth, no multi-tenant, no write path beyond USED/RESOLVED edges, one
