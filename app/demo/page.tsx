@@ -172,7 +172,7 @@ export default function DemoPage() {
             </p>
           </div>
           <p className="rounded-xl border px-4 py-3 text-sm leading-6 flex-shrink-0" style={{ borderColor: "var(--line)", background: "var(--surface-lift)", color: "var(--text-dim)" }}>
-            Snapshot mode — recorded run from the seeded graph. Numbers are estimates, not live.
+            Snapshot mode - recorded run from the seeded graph. Numbers are estimates, not live.
           </p>
         </div>
 
