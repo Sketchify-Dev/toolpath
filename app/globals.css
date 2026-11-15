@@ -107,10 +107,10 @@ a:focus-visible {
 }
 
 .card-light {
-  background: var(--card-bg);
-  border: 1px solid var(--card-border);
+  background: var(--surface-lift);
+  border: 1px solid var(--line);
   border-radius: var(--radius);
-  color: var(--card-text);
+  color: var(--text-dim);
 }
 
 .glass {
