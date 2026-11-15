@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "npm run lint && npx tsc --noEmit && npm run build",
+    "seed": "curl -s -X POST http://localhost:3000/api/seed | node -e 'let d=\"\";process.stdin.on(\"data\",c=>d+=c).on(\"end\",()=>console.log(d))'",
+    "qa": "NODE_PATH=$PWD/node_modules node scripts/qa-screenshot.js"
   },
   "dependencies": {
     "next": "16.4.6",

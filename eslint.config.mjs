@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // External tooling / skill config (gitignored, not project source):
+    ".claude/**",
   ]),
 ]);
 

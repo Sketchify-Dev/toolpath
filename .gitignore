@@ -36,6 +36,9 @@ yarn-error.log*
 *.db-wal
 *.db-shm
 
+# QA artifacts (regenerable via `npm run qa`)
+qa-*.png
+
 # vercel
 .vercel
 
