@@ -164,12 +164,12 @@ export default function Home() {
             HydraDB Hackathon, Track 2 - agent context layer
           </div>
           <h1
-            className="mt-6 text-5xl font-bold leading-[1.02] tracking-tight sm:text-6xl lg:text-7xl"
+            className="mt-8 text-6xl font-bold leading-[1.02] tracking-tight sm:text-7xl lg:text-8xl"
             style={{ fontFamily: "var(--font-display)" }}
           >
-            Traverse, don't preload.
+            Traverse, don&rsquo;t preload.
           </h1>
-          <p className="mt-7 max-w-2xl text-lg leading-8" style={{ color: "var(--text-dim)" }}>
+          <p className="lead mt-8 max-w-2xl" style={{ color: "var(--text-dim)" }}>
             Agents stuff forty tool schemas into context before the first thought.
             Toolpath walks the tool graph in HydraDB and pulls only the three the
             task needs.
@@ -186,18 +186,20 @@ export default function Home() {
             </Link>
           </div>
 
-          <div className="mt-16 relative">
-            <div className="card p-8 rounded-3xl border">
-              <div className="flex items-center gap-4 mb-6">
-                <div className="w-10 h-10 rounded-2xl bg-surface-lift flex items-center justify-center" style={{ border: "1px solid var(--line)" }}>
-                  <span className="text-accent font-bold" style={{ fontFamily: "var(--font-display)" }}>G</span>
+          <div className="mt-20 relative">
+            <div className="card p-10 rounded-3xl border">
+              <div className="flex items-center gap-4 mb-8">
+                <div className="w-12 h-12 rounded-2xl bg-surface-lift flex items-center justify-center" style={{ border: "1px solid var(--line)" }}>
+                  <span className="text-lg font-bold" style={{ color: "var(--accent)", fontFamily: "var(--font-display)" }}>G</span>
                 </div>
                 <div>
-                  <p className="text-sm font-semibold" style={{ color: "var(--text)" }}>Graph traversal preview</p>
-                  <p className="text-xs text-dim">Recorded traversal from the seeded tool graph</p>
+                  <p className="text-base font-semibold" style={{ color: "var(--text)" }}>Graph traversal preview</p>
+                  <p className="text-sm text-dim">Recorded traversal from the seeded tool graph</p>
                 </div>
               </div>
-              <PathGraph nodes={PATH} edges={EDGES} activePath={ACTIVE_PATH} />
+              <div className="min-h-[320px]">
+                <PathGraph nodes={PATH} edges={EDGES} activePath={ACTIVE_PATH} />
+              </div>
             </div>
           </div>
         </section>
@@ -247,7 +249,7 @@ export default function Home() {
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
             {PROOFS.map((p) => (
               <div key={p.unit} className="card-light p-8 text-center">
-                <p className="demo-num text-5xl font-bold counter" style={{ fontFamily: "var(--font-num)" }}>
+                <p className="demo-num text-5xl font-bold" style={{ fontFamily: "var(--font-num)" }}>
                   {p.value}
                 </p>
                 <p className="mt-3 text-sm font-semibold">{p.unit}</p>

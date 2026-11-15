@@ -13,9 +13,6 @@
   --accent-hover: #7DD3FC;
   --accent-glow: rgba(56, 189, 248, 0.15);
   --accent-dim: rgba(56, 189, 248, 0.10);
-  --card-bg: #F8FAFC;
-  --card-text: #0B1220;
-  --card-border: #E2E8F0;
   --warn: #FBBF24;
   --warn-glow: rgba(251, 191, 36, 0.15);
   --radius: 16px;
@@ -71,6 +68,13 @@ h1 { font-size: 3rem; }
 h2 { font-size: 2.25rem; }
 h3 { font-size: 1.5rem; }
 h4 { font-size: 1.125rem; }
+
+.lead {
+  font-size: 1.125rem;
+  line-height: 1.6;
+  color: var(--text-dim);
+  max-width: 42rem;
+}
 
 p {
   color: var(--text);
@@ -161,18 +165,6 @@ a:focus-visible {
 .btn-ghost:hover {
   background: var(--surface-lift);
   border-color: var(--line-hover);
-  color: var(--accent);
-}
-
-.btn-outline-light {
-  background: transparent;
-  color: var(--text);
-  border: 1px solid var(--line);
-}
-
-.btn-outline-light:hover {
-  background: var(--surface-lift);
-  border-color: var(--accent);
   color: var(--accent);
 }
 

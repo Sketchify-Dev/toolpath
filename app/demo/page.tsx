@@ -179,7 +179,7 @@ export default function DemoPage() {
         {result === null && !loading && (
           <div className="card p-12 text-center" style={{ color: "var(--text-dim)" }}>
             <p className="text-lg">Ready to run.</p>
-            <p className="mt-2 text-sm">The sample run starts automatically. Press 'Run task' to run a different task.</p>
+            <p className="mt-2 text-sm">The sample run starts automatically. Press &lsquo;Run task&rsquo; to run a different task.</p>
           </div>
         )}
 
@@ -239,7 +239,9 @@ export default function DemoPage() {
                       {graph?.nodes.length ?? 0} nodes
                     </span>
                   </div>
-                  <PathGraph nodes={graph?.nodes ?? []} edges={graph?.edges ?? []} activePath={toolpath?.path ?? []} />
+                  <div className="min-h-[340px]">
+                    <PathGraph nodes={graph?.nodes ?? []} edges={graph?.edges ?? []} activePath={toolpath?.path ?? []} />
+                  </div>
                 </div>
               </div>
 
@@ -338,7 +340,7 @@ export default function DemoPage() {
                 <div className="card p-5">
                   <p className="text-sm leading-6" style={{ color: "var(--text)" }}>
                     Entity tie-break: {toolpath.resolution.candidates} candidates for
-                    "Acme", kept{" "}
+                    &ldquo;Acme&rdquo;, kept{" "}
                     <span className="demo-num" style={{ color: "var(--accent)", fontFamily: "var(--font-num)" }}>
                       {toolpath.resolution.chosen}
                     </span>{" "}
