@@ -12,13 +12,13 @@
 
 ## Skill references (external, not installable packages)
 
-- impeccable.style — shape, critique, polish
-- tasteskill.dev — Taste Skill, dials for variance and motion (available as `design-taste-frontend` skill)
-- usehallmark.com — Hallmark, 21 themes and 58 checks
-- uupm.cc — UI UX Pro Max, 192 palettes and 119 UX rules
-- craftwork.design/skills — Craftwork, 114 vetted design skills
-- https://github.com/Aayan15728/majestic-ui-skill — Majestic UI skill
-- ui-skills.com — all UI skills
+- impeccable.style, shape, critique, polish
+- tasteskill.dev, Taste Skill, dials for variance and motion (available as `design-taste-frontend` skill)
+- usehallmark.com, Hallmark, 21 themes and 58 checks
+- uupm.cc, UI UX Pro Max, 192 palettes and 119 UX rules
+- craftwork.design/skills, Craftwork, 114 vetted design skills
+- https://github.com/Aayan15728/majestic-ui-skill, Majestic UI skill
+- ui-skills.com, all UI skills
 
 ## Door policy
 
