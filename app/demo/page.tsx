@@ -16,8 +16,6 @@ interface ComparePayload {
 }
 
 const SAMPLE = "summarize PR #412 and file a follow-up issue";
-const FOLLOWUP = "what repo was that PR in?";
-const TIEBREAK = "find the Acme invoice";
 
 const METRICS = [
   { k: "Tools loaded", bKey: "tools_loaded", tKey: "tools_loaded", unit: "" },
@@ -332,6 +330,28 @@ export default function DemoPage() {
                     </div>
                   );
                 })}
+              </div>
+              <div className="mt-6 p-5 rounded-2xl border" style={{ borderColor: "var(--line)", background: "var(--surface-lift)" }}>
+                <h3 className="text-sm font-semibold mb-3" style={{ fontFamily: "var(--font-display)" }}>
+                  How the numbers are calculated
+                </h3>
+                <ul className="text-sm space-y-2" style={{ color: "var(--text-dim)" }}>
+                  <li>
+                    <strong>Tools loaded:</strong> tool schemas hydrated into agent context. Baseline preloads all 40 (30 catalog + 10 ambient platform). Toolpath loads only the traversed tools (3 for this task).
+                  </li>
+                  <li>
+                    <strong>Context tokens:</strong> estimated cost. Schema: 300 tokens per tool. Entity: 200 tokens per resolved entity. Overhead: 100 tokens per round trip. Estimates, not live tokenizer measurements.
+                  </li>
+                  <li>
+                    <strong>Round trips:</strong> tool execution calls. Toolpath makes 1 graph traversal query ({toolpath?.hops} hops via algo.MSpaths) plus {toolpath?.round_trips} tool execution calls. Baseline makes 4 sequential tool calls with no graph traversal.
+                  </li>
+                  <li>
+                    <strong>Traversal hops:</strong> edges crossed in the graph traversal. Toolpath: capability-to-tool edges. Baseline: 0 (no graph used).
+                  </li>
+                  <li>
+                    <strong>Mode:</strong> {snapshot ? "Snapshot (recorded run from seeded graph)" : "Live HydraDB"}.
+                  </li>
+                </ul>
               </div>
             </section>
 

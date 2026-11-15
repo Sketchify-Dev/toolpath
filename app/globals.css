@@ -88,11 +88,17 @@ p {
 a {
   color: var(--text);
   text-decoration: none;
-  transition: color var(--duration-fast) var(--ease-out);
+  border-bottom: none;
+  transition: color var(--duration-base) var(--ease-out);
 }
 
 a:hover {
   color: var(--accent);
+}
+
+a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 .card {

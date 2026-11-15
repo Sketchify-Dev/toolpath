@@ -6,8 +6,8 @@ import type { GraphNode, GraphEdge } from "@/lib/graph";
 
 const PROOFS = [
   { value: "1,800", unit: "tokens", note: "vs 12,400 preloaded" },
-  { value: "3", unit: "tools", note: "vs 40 in context" },
-  { value: "1", unit: "round trip", note: "algo.MSpaths, not fan-out" },
+  { value: "3", unit: "tools", note: "vs 40 in context (30 catalog + 10 ambient)" },
+  { value: "1", unit: "graph traversal", note: "algo.MSpaths, not fan-out" },
   { value: "0", unit: "refetches", note: "entities reused on follow-up" },
 ];
 
@@ -34,6 +34,9 @@ const STEPS = [
 
 const PATH: GraphNode[] = [
   { id: "task:run", label: "Task", type: "task", degree: 3, loaded: true },
+  { id: "entity:repo", label: "hydra/core", type: "entity", degree: 9, loaded: true },
+  { id: "entity:pr", label: "PR #412", type: "entity", degree: 6, loaded: true },
+  { id: "entity:issue", label: "issue #77", type: "entity", degree: 3, loaded: true },
   { id: "cap:repo", label: "repos", type: "capability", degree: 5, loaded: true },
   { id: "cap:pr", label: "pull requests", type: "capability", degree: 10, loaded: true },
   { id: "cap:issue", label: "issues", type: "capability", degree: 9, loaded: true },
@@ -43,6 +46,9 @@ const PATH: GraphNode[] = [
 ];
 
 const EDGES: GraphEdge[] = [
+  { from: "task:run", to: "entity:repo", type: "RESOLVED" },
+  { from: "task:run", to: "entity:pr", type: "RESOLVED" },
+  { from: "task:run", to: "entity:issue", type: "RESOLVED" },
   { from: "task:run", to: "cap:repo", type: "HAS_CAPABILITY" },
   { from: "task:run", to: "cap:pr", type: "HAS_CAPABILITY" },
   { from: "task:run", to: "cap:issue", type: "HAS_CAPABILITY" },
@@ -63,11 +69,11 @@ const FAQS = [
   },
   {
     q: "Where do the token numbers come from?",
-    a: "From the runner, not estimates. Baseline loads all 40 schemas at measured sizes, toolpath loads only the traversed tools plus entity and round trip overhead. Hit /api/compare to see the raw JSON.",
+    a: "From the runner, using a documented estimate: each tool schema is counted at 300 tokens, each entity at 200 tokens, plus round-trip overhead. These are reproducible estimates, not live tokenizer measurements. Hit /api/compare to see the raw JSON and the calculation.",
   },
   {
     q: "What is actually stored in the graph?",
-    a: "Tool nodes with cost and latency, Capability nodes, PROVIDES edges, plus USED and RESOLVED edges written per run. POST /api/seed writes it with MERGE only, so reseeding is idempotent.",
+    a: "Tool nodes with cost and latency, Capability nodes, PROVIDES edges, plus USED and RESOLVED edges written per run. POST /api/seed writes it with MERGE only, so reseeding is idempotent. The demo runs in snapshot mode by default.",
   },
   {
     q: "Who is this for?",
@@ -174,8 +180,8 @@ export default function Home() {
                     <span className="text-accent font-bold" style={{ fontFamily: "var(--font-display)" }}>G</span>
                   </div>
                   <div>
-                    <p className="text-sm font-semibold" style={{ color: "var(--text)" }}>Live graph traversal</p>
-                    <p className="text-xs text-dim">Watch the path light up in real time</p>
+                    <p className="text-sm font-semibold" style={{ color: "var(--text)" }}>Graph traversal preview</p>
+                    <p className="text-xs text-dim">Recorded traversal from the seeded tool graph</p>
                   </div>
                 </div>
                 <PathGraph nodes={PATH} edges={EDGES} activePath={ACTIVE_PATH} />

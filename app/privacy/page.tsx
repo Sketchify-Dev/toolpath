@@ -53,8 +53,7 @@ export default function PrivacyPage() {
             Questions: open an issue on the{" "}
             <a
               href="https://github.com/Sketchify-Dev/toolpath"
-              className="underline"
-              style={{ color: "var(--text)" }}
+              className="hover:text-[var(--accent)] transition-colors"
             >
               GitHub repo
             </a>

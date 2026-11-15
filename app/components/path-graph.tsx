@@ -1,9 +1,7 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import type { GraphEdge, GraphNode } from "@/lib/graph";
-
-const PATH_ORDER = ["task", "capability", "tool", "entity"] as const;
 
 function typeColor(type: GraphNode["type"]): string {
   switch (type) {
@@ -17,87 +15,94 @@ function typeColor(type: GraphNode["type"]): string {
 
 function nodeRadius(type: GraphNode["type"]): number {
   switch (type) {
-    case "task": return 18;
-    case "capability": return 14;
-    case "tool": return 10;
-    case "entity": return 12;
-    default: return 10;
+    case "task": return 20;
+    case "capability": return 15;
+    case "tool": return 11;
+    case "entity": return 13;
+    default: return 11;
   }
 }
+
+function typeLabel(type: GraphNode["type"]): string {
+  switch (type) {
+    case "task": return "task";
+    case "capability": return "capability";
+    case "tool": return "tool";
+    case "entity": return "entity";
+    default: return "node";
+  }
+}
+
+const LEGEND_ITEMS: Array<[string, string]> = [
+  ["task", "var(--accent)"],
+  ["capability", "#7dd3fc"],
+  ["tool", "var(--warn)"],
+  ["entity", "#c4b5fd"],
+];
 
 export default function PathGraph({ nodes, edges, activePath }: {
   nodes: GraphNode[];
   edges: GraphEdge[];
   activePath: string[];
 }) {
-  const [svgSize, setSvgSize] = useState({ w: 0, h: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
+  const [svgSize, setSvgSize] = useState({ w: 0, h: 0 });
 
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
     const ro = new ResizeObserver(() => {
       const r = el.getBoundingClientRect();
-      setSvgSize({ w: r.width, h: r.height });
+      setSvgSize({ w: Math.max(r.width, 320), h: Math.max(r.height, 260) });
     });
     ro.observe(el);
     return () => ro.disconnect();
   }, []);
 
-  const nodeById = new Map(nodes.map((n) => [n.id, n]));
+  const w = svgSize.w || 640;
+  const h = svgSize.h || 280;
 
-  useEffect(() => {
-    const r = containerRef.current?.getBoundingClientRect();
-    if (r) setSvgSize({ w: r.width, h: r.height });
-  }, []);
-
-  const w = svgSize.w || 700;
-  const h = svgSize.h || 360;
-
-  const layout = computeLayout(nodes, w, h);
+  const layout = useMemo(() => computeLayout(nodes, w, h), [nodes, w, h]);
+  const nodeById = useMemo(() => new Map(nodes.map((n) => [n.id, n])), [nodes]);
 
   return (
-    <div ref={containerRef} className="w-full h-full min-h-[360px]">
+    <div ref={containerRef} className="w-full h-full min-h-[280px] relative">
       <svg
         width={w}
         height={h}
         className="w-full h-full block"
-        style={{ overflow: "visible" }}
+        style={{ overflow: "visible", display: "block" }}
       >
         <defs>
           <marker
             id="arrow"
-            markerWidth="8"
-            markerHeight="8"
-            refX="7"
-            refY="3"
-            orient="auto"
+            markerWidth="9"
+            markerHeight="9"
+            refX="8"
+            refY="4.5"
+            orient="auto-start-reverse"
             markerUnits="strokeWidth"
           >
-            <path d="M0,0 L0,6 L6,3 z" fill="var(--muted)" />
+            <path d="M0,0 L0,9 L9,4.5 z" fill="var(--muted)" />
           </marker>
           <marker
             id="arrow-active"
-            markerWidth="8"
-            markerHeight="8"
-            refX="7"
-            refY="3"
-            orient="auto"
+            markerWidth="9"
+            markerHeight="9"
+            refX="8"
+            refY="4.5"
+            orient="auto-start-reverse"
             markerUnits="strokeWidth"
           >
-            <path d="M0,0 L0,6 L6,3 z" fill="var(--accent)" />
+            <path d="M0,0 L0,9 L9,4.5 z" fill="var(--accent)" />
           </marker>
-          <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur stdDeviation="2.5" result="blur" />
+          <filter id="nodeGlow" x="-40%" y="-40%" width="180%" height="180%">
+            <feGaussianBlur stdDeviation="3" result="blur" />
             <feComposite in="SourceGraphic" in2="blur" operator="over" />
           </filter>
-          <linearGradient id="edge-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="var(--muted)" />
-            <stop offset="100%" stopColor="var(--line)" />
-          </linearGradient>
         </defs>
 
-        {/* Edges */}
+        {/* Edges - drawn first so they sit behind nodes */}
         {edges.map((e, i) => {
           const isActive = activePath.includes(e.from) && activePath.includes(e.to);
           const from = layout.get(e.from);
@@ -114,16 +119,23 @@ export default function PathGraph({ nodes, edges, activePath }: {
           const x2 = to.x - (dx / dist) * rTo;
           const y2 = to.y - (dy / dist) * rTo;
 
+          // Slight curve for visual polish
+          const midX = (x1 + x2) / 2;
+          const midY = (y1 + y2) / 2;
+          const perpX = -dy / dist;
+          const perpY = dx / dist;
+          const curve = Math.min(dist * 0.12, 24);
+          const cpX = midX + perpX * curve;
+          const cpY = midY + perpY * curve;
+
           return (
-            <line
+            <path
               key={`e-${i}`}
-              x1={x1}
-              y1={y1}
-              x2={x2}
-              y2={y2}
+              d={`M${x1},${y1} Q${cpX},${cpY} ${x2},${y2}`}
+              fill="none"
               stroke={isActive ? "var(--accent)" : "var(--line)"}
-              strokeWidth={isActive ? 3 : 1.5}
-              strokeOpacity={isActive ? 1 : 0.35}
+              strokeWidth={isActive ? 2.5 : 1}
+              strokeOpacity={isActive ? 1 : 0.3}
               marker-end={isActive ? "url(#arrow-active)" : "url(#arrow)"}
               className={isActive ? "path-lit" : ""}
             />
@@ -136,36 +148,81 @@ export default function PathGraph({ nodes, edges, activePath }: {
           const { x, y } = layout.get(n.id) ?? { x: 0, y: 0 };
           const r = nodeRadius(n.type);
           const col = typeColor(n.type);
+          const loaded = n.loaded;
 
           return (
-            <g key={n.id} className={isActive ? "rise-in" : ""} style={{ animationDelay: `${Math.min(activePath.indexOf(n.id), 4) * 90}ms` }}>
+            <g key={n.id}>
+              {/* Subtle ring for inactive nodes */}
+              {!isActive && !loaded && (
+                <circle
+                  cx={x}
+                  cy={y}
+                  r={r + 4}
+                  fill="none"
+                  stroke="var(--line)"
+                  strokeWidth={1}
+                  strokeOpacity={0.25}
+                />
+              )}
               <circle
                 cx={x}
                 cy={y}
                 r={r}
-                fill={isActive ? col : "var(--surface-lift)"}
-                stroke={isActive ? col : "var(--line)"}
-                strokeWidth={isActive ? 3 : 1.5}
-                filter={isActive ? "url(#glow)" : undefined}
-                style={{ transition: "all 400ms cubic-bezier(0.25, 1, 0.5, 1)" }}
+                fill={isActive ? col : loaded ? "var(--surface-lift)" : "var(--bg)"}
+                stroke={isActive ? col : loaded ? "var(--line)" : "var(--line)"}
+                strokeWidth={isActive ? 3 : loaded ? 1.5 : 1}
+                filter={isActive ? "url(#nodeGlow)" : undefined}
+                style={{
+                  transition: "all 450ms cubic-bezier(0.25, 1, 0.5, 1)",
+                  opacity: loaded || isActive ? 1 : 0.45,
+                }}
               />
               <text
                 x={x}
                 y={y + 4}
                 textAnchor="middle"
-                fill={isActive ? "#0b0c0e" : "var(--text-dim)"}
-                fontSize={n.type === "task" ? 11 : n.type === "capability" ? 9 : 8}
+                fill={isActive ? "#0b0c0e" : loaded ? "var(--text)" : "var(--text-dim)"}
+                fontSize={n.type === "task" ? 11 : n.type === "capability" ? 9 : 7.5}
                 fontFamily="var(--font-display)"
-                fontWeight={isActive ? 700 : 500}
-                letterSpacing="-0.01em"
+                fontWeight={isActive ? 700 : loaded ? 600 : 500}
+                letterSpacing="-0.02em"
                 pointerEvents="none"
+                style={{
+                  transition: "all 450ms cubic-bezier(0.25, 1, 0.5, 1)",
+                }}
               >
                 {n.label}
+              </text>
+              <text
+                x={x}
+                y={y + r + 12}
+                textAnchor="middle"
+                fill="var(--muted)"
+                fontSize={6.5}
+                fontFamily="var(--font-mono)"
+                fontWeight={500}
+                pointerEvents="none"
+                style={{ opacity: loaded || isActive ? 0.7 : 0.3 }}
+              >
+                [{typeLabel(n.type)}]
               </text>
             </g>
           );
         })}
       </svg>
+
+      {/* Legend */}
+      <div className="absolute bottom-3 left-3 flex gap-3 text-xs text-muted">
+        {LEGEND_ITEMS.map(([type, color]) => (
+          <span key={type} className="flex items-center gap-1.5">
+            <span
+              className="w-2 h-2 rounded-full"
+              style={{ background: color }}
+            />
+            {type}
+          </span>
+        ))}
+      </div>
     </div>
   );
 }
@@ -178,22 +235,22 @@ function computeLayout(nodes: GraphNode[], w: number, h: number): Map<string, { 
   const capabilities = nodes.filter((n) => n.type === "capability");
   const tools = nodes.filter((n) => n.type === "tool");
 
-  if (task) layout.set(task.id, { x: w * 0.5, y: h * 0.14 });
+  if (task) layout.set(task.id, { x: w * 0.5, y: h * 0.16 });
 
   entities.forEach((n, i) => {
-    layout.set(n.id, { x: w * (0.18 + i * 0.22), y: h * 0.30 });
+    layout.set(n.id, { x: w * (0.16 + i * 0.21), y: h * 0.34 });
   });
 
   capabilities.forEach((n, i) => {
-    layout.set(n.id, { x: w * (0.08 + i * 0.17), y: h * 0.52 });
+    layout.set(n.id, { x: w * (0.09 + i * 0.16), y: h * 0.56 });
   });
 
   const cols = 8;
-  const toolW = w * 0.88;
-  const toolStartX = w * 0.06;
+  const toolW = w * 0.86;
+  const toolStartX = w * 0.07;
   const toolStepX = toolW / cols;
-  const toolStartY = h * 0.72;
-  const toolStepY = h * 0.13;
+  const toolStartY = h * 0.76;
+  const toolStepY = h * 0.15;
 
   tools.forEach((n, i) => {
     const col = i % cols;

@@ -90,6 +90,7 @@ export const SEED_STATEMENTS: string[] = [
   `UNWIND $rows AS row MERGE (c:Capability {id: row.id}) SET c.name = row.name`,
   `UNWIND $rows AS row MATCH (t:Tool {id: row.from}) MATCH (c:Capability {id: row.to}) MERGE (t)-[:PROVIDES]->(c)`,
   `UNWIND $rows AS row MATCH (t:Tool {id: row.tool}) MATCH (c:Capability {id: row.cap}) MERGE (r:TaskRun {id: row.run}) MERGE (r)-[:NEEDS]->(c) MERGE (r)-[:USED]->(t)`,
+  `UNWIND $rows AS row MATCH (r:TaskRun {id: row.run}) MERGE (e:Entity {id: row.entity}) SET e.kind = row.kind, e.label = row.label MERGE (r)-[:RESOLVED]->(e)`,
 ];
 
 export const TRAVERSAL_CYPHER = `MATCH (r:TaskRun {id: $runId})-[:NEEDS]->(c:Capability) MATCH (t:Tool)-[:PROVIDES]->(c) RETURN c.id AS capability, t.id AS tool_id, t.cost_tokens AS cost ORDER BY capability, cost ASC`;

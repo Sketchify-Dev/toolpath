@@ -79,7 +79,7 @@ export default function AboutPage() {
             </ul>
             <p className="mt-10 pt-8 border-t border-[var(--line)]" style={{ color: "var(--muted)" }}>
               Source:{" "}
-              <a href="https://github.com/Sketchify-Dev/toolpath" className="underline underline-offset-4 hover:text-[var(--accent)] transition-colors" style={{ color: "var(--text)" }}>
+              <a href="https://github.com/Sketchify-Dev/toolpath" className="hover:text-[var(--accent)] transition-colors" style={{ color: "var(--text)" }}>
                 GitHub repo
               </a>
               .
