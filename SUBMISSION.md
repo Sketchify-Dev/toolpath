@@ -62,6 +62,8 @@ subtitles). Editable Remotion source and production report are in
 `video/`. Scenes: Hook, Problem, Intro, Traversal, Demo (real footage),
 Numbers, Honesty, Closing.
 
+**YouTube:** https://youtu.be/1VlQuGQ89tc
+
 
 ## Judging criteria: technical implementation
 

@@ -4,6 +4,8 @@
 
 Live demo: https://toolpath-five.vercel.app/demo (snapshot mode, no login, runs on load).
 
+Demo film (YouTube): https://youtu.be/1VlQuGQ89tc
+
 Agent context layer on HydraDB, built for the HydraDB Hackathon, Track 2.
 
 Sponsor tech: HydraDB (graph store for tools, skills, MCP servers, entities),
